@@ -1,6 +1,5 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "@/components/HelloWorld.vue";
+import { RouterView } from "vue-router";
 import { useDatabaseStore } from '@/stores/database'
 
 
@@ -8,6 +7,7 @@ const items = [
     {
         label: 'Login',
         icon: 'pi pi-user',
+        to: '/login'
     },
     {
         label: 'Register',
@@ -22,16 +22,18 @@ counter.connect('localhost', 'root', '')
 </script>
 
 <template>
-  <header>
-    <Menubar :model="items" />
+    <header>
+        <Menubar :model="items" />
+    </header>
 
-  </header>
-
-  <RouterView />
+    <RouterView />
 </template>
 
 <style>
-    body {
-        background-color: var(--surface-ground);
-    }
+body {
+    background-color: var(--surface-ground);
+    font-family: var(--font-family);
+    font-weight: 400;
+    color: var(--text-color);
+}
 </style>
