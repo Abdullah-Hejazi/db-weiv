@@ -13,6 +13,11 @@ import Card from 'primevue/card';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
+import Checkbox from 'primevue/checkbox';
+import InputNumber from 'primevue/inputnumber';
+import Tooltip from 'primevue/tooltip';
+import Dialog from 'primevue/dialog';
+import InlineMessage from 'primevue/inlinemessage';
 
 
 import App from "./App.vue";
@@ -29,5 +34,12 @@ app.component('Card', Card);
 app.component('Button', Button);
 app.component('InputText', InputText);
 app.component('Password', Password);
+app.component('Checkbox', Checkbox);
+app.component('InputNumber', InputNumber);
+app.component('Dialog', Dialog);
+// app.component('Tooltip', Tooltip);
+app.component('InlineMessage', InlineMessage);
+
+app.directive('Tooltip', Tooltip);
 
 app.mount("#app");

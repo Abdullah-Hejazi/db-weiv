@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import mysql from 'mysql2'
+import mysql from 'mysql2/promise'
 
 export const useDatabaseStore = defineStore({
     id: "database",
@@ -11,7 +11,7 @@ export const useDatabaseStore = defineStore({
     },
 
     actions: {
-        connect(host, username, password, port=3306, database=null) {
+        async connect(host, username, password, port) {
             let data = {
                 host: host,
                 user: username,
@@ -19,16 +19,16 @@ export const useDatabaseStore = defineStore({
                 password: password
             }
 
-            if (database) {
-                data.database = database
+            let error = null
+
+            this.connection = await mysql.createConnection(data).catch(err => {
+                error = err
+            })
+
+            return {
+                error: error?.message,
+                success: !error
             }
-
-            this.connection = mysql.createConnection(data);
-
-
-            this.connection.connect((error) => {
-                if (error) throw error;
-            });
         },
     },
 });
