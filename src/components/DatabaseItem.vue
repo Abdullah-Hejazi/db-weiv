@@ -53,7 +53,7 @@ export default {
 
         <div class="px-3 py-3 text-400 flex justify-content-between">
             <small>{{ database.DEFAULT_COLLATION_NAME }}</small>
-            <small>{{ database.DEFAULT_CHARACTER_SET_NAME }}</small>
+            <Button icon="pi pi-cog" class="p-button-rounded p-button-secondary p-button-text" />
         </div>
     </div>
 </template>
