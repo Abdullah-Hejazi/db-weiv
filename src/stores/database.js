@@ -5,13 +5,17 @@ export const useDatabaseStore = defineStore({
     id: "database",
     state: () => ({
         connection: null,
+        data: {},
+        databases: []
     }),
 
     getters: {
     },
 
     actions: {
-        async connect(host, username, password, port) {
+        async Connect(host, username, password, port) {
+            this.ClearConnection();
+
             let data = {
                 host: host,
                 user: username,
@@ -21,14 +25,26 @@ export const useDatabaseStore = defineStore({
 
             let error = null
 
-            this.connection = await mysql.createConnection(data).catch(err => {
-                error = err
-            })
+            try {
+                this.connection = await mysql.createPool(data)
+
+                let [databases] = await this.connection.query('SHOW DATABASES')
+                this.databases = databases
+            } catch (e) {
+                error = e
+            }
+
+            this.data = data
 
             return {
-                error: error?.message,
-                success: !error
+                success: !error,
+                error: error?.message
             }
         },
+
+        ClearConnection() {
+            this.data = {}
+            this.connection = null
+        }
     },
 });

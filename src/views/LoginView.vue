@@ -2,16 +2,23 @@
 
 import { useDatabaseStore } from '@/stores/database'
 
+import AccountItem from '@/components/AccountItem'
+
 export default {
     name: 'LoginView',
 
+    components: {
+        AccountItem
+    },
+
     data() {
         return {
-            form: {
+            loginData: {
                 username: '',
                 password: '',
                 host: '',
-                port: null
+                port: null,
+                displayName: ''
             },
             loading: false,
             moreOptions: {
@@ -20,32 +27,47 @@ export default {
                 active: false
             },
             error: '',
-            displayName: '',
-            displayNameDialog: false
+            displayNameDialog: false,
+            savedAccounts: [],
         }
+    },
+
+    mounted () {
+        this.savedAccounts = localStorage.getItem('savedAccounts') ? JSON.parse(localStorage.getItem('savedAccounts')) : []
     },
 
     methods: {
         async Login() {
-            this.error = ''
             this.loading = true
+
+            await this.PerformLogin(this.loginData)
+
+            this.loading = false
+        },
+
+        async PerformLogin(data) {
+            this.error = ''
 
             const database = useDatabaseStore()
 
-            let result = await database.connect(
-                this.form.host == '' ? 'localhost' : this.form.host,
-                this.form.username,
-                this.form.password,
-                this.form.port == null ? 3306 : this.form.port
-            )
-
-            this.loading = false
-
-            if (result.success) {
-                console.log('Login successful')
-            } else {
-                this.error = result.error
+            try {
+                this.Invoke(
+                    await database.Connect(
+                        data.host,
+                        data.username,
+                        data.password,
+                        data.port
+                    )
+                )
+            } catch (error) {
+                this.error = error.message
             }
+        },
+
+        Invoke(result) {
+            if (result.success) return true;
+
+            throw new Error(result?.error)
         },
 
         MoreOptions() {
@@ -60,7 +82,26 @@ export default {
         },
 
         SaveAccount() {
-            this.displayNameDialog = true
+            let data = {
+                username: this.loginData.username,
+                host: this.loginData.host == '' ? 'localhost' : this.loginData.host,
+                port: this.loginData.port == null ? 3306 : this.loginData.port,
+                displayName: this.loginData.displayName
+            }
+
+            this.savedAccounts.push(data)
+            localStorage.setItem('savedAccounts', JSON.stringify(this.savedAccounts))
+
+            this.displayNameDialog = false
+        },
+
+        RemoveAccount(index) {
+            this.savedAccounts.splice(index, 1);
+            localStorage.setItem('savedAccounts', JSON.stringify(this.savedAccounts))
+        },
+
+        async LoadAccount(index) {
+            await this.PerformLogin(this.savedAccounts[index])
         }
     },
 }
@@ -69,13 +110,13 @@ export default {
 
 <template>
     <div class="login">
-        <div class="form-card mx-auto surface-card p-4 shadow-2 border-round">
+        <div class="loginData-card loginData-margin mx-auto surface-card p-4 shadow-2 border-round">
             <div class="text-center mb-5">
                 <img src="@/assets/logo.png" alt="DB Weiv" width="100" class="mb-3">
                 <div class="text-900 text-3xl font-medium mb-3">Login</div>
             </div>
 
-            <InlineMessage severity="error" v-if="error" class="mb-3">
+            <InlineMessage severity="error" v-if="error" class="mb-3 w-full">
                 {{ error }}
             </InlineMessage>
 
@@ -85,7 +126,7 @@ export default {
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-user"></i>
                         </span>
-                        <InputText placeholder="Username" v-model="form.username" />
+                        <InputText placeholder="Username" v-model="loginData.username" />
                     </div>
                 </div>
 
@@ -94,7 +135,7 @@ export default {
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-lock"></i>
                         </span>
-                        <Password placeholder="Password" v-model="form.password" toggle-mask :feedback="false" />
+                        <Password placeholder="Password" v-model="loginData.password" toggle-mask :feedback="false" />
                     </div>
                 </div>
 
@@ -104,7 +145,7 @@ export default {
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-server"></i>
                             </span>
-                            <InputText placeholder="Host" v-model="form.host"
+                            <InputText placeholder="Host" v-model="loginData.host"
                                 v-tooltip.right="'Defaults to: localhost'" />
                         </div>
                     </div>
@@ -114,7 +155,7 @@ export default {
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-sort-alt"></i>
                             </span>
-                            <InputNumber placeholder="Port" v-model="form.port" mode="decimal" :use-grouping="false"
+                            <InputNumber placeholder="Port" v-model="loginData.port" mode="decimal" :use-grouping="false"
                                 v-tooltip.right="'Defaults to: 3306'" />
                         </div>
                     </div>
@@ -135,11 +176,36 @@ export default {
             </div>
         </div>
 
+        <div class="loginData-card mx-auto surface-card pt-3 shadow-2 border-round mt-3">
+            <div class="text-center">
+                <div class="text-600 text-2xl font-medium">Saved Accounts</div>
+            </div>
+
+            <div class="px-5">
+                <Divider />
+            </div>
+
+            <div class="p-3">
+                <AccountItem
+                    v-for="(account, index) in savedAccounts"
+                    :key="index"
+                    :account="account"
+                    :index="index"
+                    :remove="RemoveAccount"
+                    :load="LoadAccount"
+                />
+
+                <div class="text-center text-600 mb-3" v-if="savedAccounts.length == 0">
+                    There are no saved accounts.
+                </div>
+            </div>
+        </div>
+
         <Dialog header="Save account" v-model:visible="displayNameDialog" class="display-name-dialog">
             <div class="p-text-secondary">
                 <small>Your password will not be saved. You'll enter it manually everytime you connect.</small>
 
-                <InputText placeholder="Display Name" v-model="displayName" class="w-full mt-3" />
+                <InputText placeholder="Display Name" v-model="loginData.displayName" class="w-full mt-3" />
             </div>
 
             <template #footer>
@@ -154,10 +220,13 @@ export default {
 </template>
 
 <style>
-.form-card {
+.loginData-card {
     width: 550px;
     max-width: 90vw;
-    margin-top: 20vh;
+}
+
+.loginData-margin {
+    margin-top: 100px;
 }
 
 .display-name-dialog {

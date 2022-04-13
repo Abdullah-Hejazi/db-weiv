@@ -1,6 +1,5 @@
 <script setup>
 import { RouterView } from "vue-router";
-import { useDatabaseStore } from '@/stores/database'
 
 
 const items = [
@@ -14,10 +13,6 @@ const items = [
         icon: 'pi pi-users',
     }
 ];
-
-const counter = useDatabaseStore();
-
-counter.connect('localhost', 'root', '')
 
 </script>
 

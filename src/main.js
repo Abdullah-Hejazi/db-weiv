@@ -18,6 +18,9 @@ import InputNumber from 'primevue/inputnumber';
 import Tooltip from 'primevue/tooltip';
 import Dialog from 'primevue/dialog';
 import InlineMessage from 'primevue/inlinemessage';
+import PanelMenu from 'primevue/panelmenu';
+import Divider from 'primevue/divider';
+import Toolbar from 'primevue/toolbar';
 
 
 import App from "./App.vue";
@@ -39,6 +42,9 @@ app.component('InputNumber', InputNumber);
 app.component('Dialog', Dialog);
 // app.component('Tooltip', Tooltip);
 app.component('InlineMessage', InlineMessage);
+app.component('PanelMenu', PanelMenu);
+app.component('Divider', Divider);
+app.component('Toolbar', Toolbar);
 
 app.directive('Tooltip', Tooltip);
 
