@@ -21,6 +21,8 @@ import InlineMessage from 'primevue/inlinemessage';
 import PanelMenu from 'primevue/panelmenu';
 import Divider from 'primevue/divider';
 import Toolbar from 'primevue/toolbar';
+import ProgressSpinner from 'primevue/progressspinner';
+import BlockUI from 'primevue/blockui';
 
 
 import App from "./App.vue";
@@ -45,6 +47,8 @@ app.component('InlineMessage', InlineMessage);
 app.component('PanelMenu', PanelMenu);
 app.component('Divider', Divider);
 app.component('Toolbar', Toolbar);
+app.component('ProgressSpinner', ProgressSpinner);
+app.component('BlockUI', BlockUI);
 
 app.directive('Tooltip', Tooltip);
 

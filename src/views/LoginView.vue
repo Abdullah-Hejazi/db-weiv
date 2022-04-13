@@ -29,6 +29,9 @@ export default {
             error: '',
             displayNameDialog: false,
             savedAccounts: [],
+            selectedAccount: false,
+            selectedAccountIndex: 0,
+            selectedAccountPassword: '',
         }
     },
 
@@ -38,14 +41,12 @@ export default {
 
     methods: {
         async Login() {
-            this.loading = true
-
             await this.PerformLogin(this.loginData)
-
-            this.loading = false
         },
 
         async PerformLogin(data) {
+            this.loading = true
+
             this.error = ''
 
             const database = useDatabaseStore()
@@ -61,6 +62,8 @@ export default {
                 )
             } catch (error) {
                 this.error = error.message
+            } finally {
+                this.loading = false
             }
         },
 
@@ -100,9 +103,20 @@ export default {
             localStorage.setItem('savedAccounts', JSON.stringify(this.savedAccounts))
         },
 
-        async LoadAccount(index) {
-            await this.PerformLogin(this.savedAccounts[index])
-        }
+        async LoadAccount() {
+            this.selectedAccount = false
+
+            let account = JSON.parse(JSON.stringify(this.savedAccounts[this.selectedAccountIndex]))
+            account.password = this.selectedAccountPassword
+
+            await this.PerformLogin(account)
+        },
+
+        async SelectAccount(index) {
+            this.selectedAccountIndex = index
+            this.selectedAccountPassword = ''
+            this.selectedAccount = true
+        },
     },
 }
 
@@ -116,7 +130,7 @@ export default {
                 <div class="text-900 text-3xl font-medium mb-3">Login</div>
             </div>
 
-            <InlineMessage severity="error" v-if="error" class="mb-3 w-full">
+            <InlineMessage severity="error" v-if="error" class="mb-3 w-full scalein">
                 {{ error }}
             </InlineMessage>
 
@@ -169,7 +183,7 @@ export default {
                 </div>
 
                 <div class="text-center mt-3 flex justify-content-between">
-                    <Button label="Sign In" icon="pi pi-user" @click="Login" :loading="loading"></Button>
+                    <Button label="Login" icon="pi pi-user" @click="Login"></Button>
                     <Button label="Save Account" class="p-button-text p-button-plain"
                         @click="displayNameDialog = true"></Button>
                 </div>
@@ -192,7 +206,7 @@ export default {
                     :account="account"
                     :index="index"
                     :remove="RemoveAccount"
-                    :load="LoadAccount"
+                    :load="SelectAccount"
                 />
 
                 <div class="text-center text-600 mb-3" v-if="savedAccounts.length == 0">
@@ -216,6 +230,23 @@ export default {
                 </div>
             </template>
         </Dialog>
+
+        <Dialog header="Type the password" v-model:visible="selectedAccount" class="display-name-dialog">
+            <div class="p-text-secondary">
+                <InputText type="password" placeholder="Password" v-model="selectedAccountPassword" class="w-full mt-3" />
+            </div>
+
+            <template #footer>
+                <div class="flex justify-content-between">
+                    <Button label="Login" icon="pi pi-user" @click="LoadAccount"></Button>
+                    <Button label="Cancel" icon="pi pi-times" @click="selectedAccount = false"
+                        class="p-button-text"></Button>
+                </div>
+            </template>
+        </Dialog>
+
+        <BlockUI :blocked="loading" :fullScreen="true" :baseZIndex="-1" />
+        <ProgressSpinner class="spinner" v-if="loading" />
     </div>
 </template>
 
@@ -231,5 +262,12 @@ export default {
 
 .display-name-dialog {
     width: 400px;
+}
+
+.spinner {
+    position: fixed;
+    top: calc(50% - 75px);
+    left: calc(50% - 75px);
+    z-index: 5;
 }
 </style>
