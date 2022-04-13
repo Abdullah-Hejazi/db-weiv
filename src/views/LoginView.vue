@@ -167,17 +167,23 @@ export default {
                     </div>
                 </div>
 
-                <div class="text-center p-text-secondary cursor-pointer mt-1 mb-3" @click="MoreOptions">
-                    <p class="text-small">
-                        {{ moreOptions.text }}
-                        <i :class="'pi ' + moreOptions.icon"></i>
-                    </p>
-                </div>
+                <div class="text-center mt-3">
+                    <Button label="Login" class="w-full" @click="Login" />
+                    
+                    <div class="flex justify-content-between">
+                        <Button
+                            label="Save Account"
+                            class="p-button-text p-button-plain"
+                            @click="displayNameDialog = true"
+                        />
 
-                <div class="text-center mt-3 flex justify-content-between">
-                    <Button label="Login" icon="pi pi-user" @click="Login"></Button>
-                    <Button label="Save Account" class="p-button-text p-button-plain"
-                        @click="displayNameDialog = true"></Button>
+                        <div class="p-text-secondary cursor-pointer" @click="MoreOptions">
+                            <p class="text-small">
+                                {{ moreOptions.text }}
+                                <i :class="'pi ' + moreOptions.icon"></i>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -207,7 +213,7 @@ export default {
             </div>
         </div>
 
-        <Dialog header="Save account" v-model:visible="displayNameDialog" class="display-name-dialog">
+        <Dialog header="Save account" v-model:visible="displayNameDialog" class="display-name-dialog" :modal="true">
             <div class="p-text-secondary">
                 <small>Your password will not be saved. You'll enter it manually everytime you connect.</small>
 
@@ -216,23 +222,29 @@ export default {
 
             <template #footer>
                 <div class="flex justify-content-between">
-                    <Button label="Save" icon="pi pi-check" @click="SaveAccount"></Button>
-                    <Button label="Cancel" icon="pi pi-times" @click="displayNameDialog = false"
-                        class="p-button-text"></Button>
+                    <Button
+                        label="Cancel"
+                        @click="displayNameDialog = false"
+                        class="p-button-text"
+                    />
+                    <Button label="Save" @click="SaveAccount" />
                 </div>
             </template>
         </Dialog>
 
-        <Dialog header="Type the password" v-model:visible="selectedAccount" class="display-name-dialog">
+        <Dialog header="Type the password" v-model:visible="selectedAccount" class="display-name-dialog" :modal="true">
             <div class="p-text-secondary">
                 <InputText type="password" placeholder="Password" v-model="selectedAccountPassword" class="w-full mt-3" />
             </div>
 
             <template #footer>
                 <div class="flex justify-content-between">
-                    <Button label="Login" icon="pi pi-user" @click="LoadAccount"></Button>
-                    <Button label="Cancel" icon="pi pi-times" @click="selectedAccount = false"
-                        class="p-button-text"></Button>
+                    <Button
+                        label="Cancel"
+                        @click="selectedAccount = false"
+                        class="p-button-text"
+                    />
+                    <Button label="Login" @click="LoadAccount" />
                 </div>
             </template>
         </Dialog>

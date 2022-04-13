@@ -28,6 +28,8 @@ import Breadcrumb from 'primevue/breadcrumb';
 import Dropdown from 'primevue/dropdown';
 import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 
 import App from "./App.vue";
@@ -61,9 +63,12 @@ app.component('Breadcrumb', Breadcrumb);
 app.component('Dropdown', Dropdown);
 // app.component('ToastService', ToastService);
 app.component('Toast', Toast);
+// app.component('ConfirmationService', ConfirmationService);
+app.component('ConfirmDialog', ConfirmDialog);
 
 
 app.directive('Tooltip', Tooltip);
 app.use(ToastService);
+app.use(ConfirmationService);
 
 app.mount("#app");

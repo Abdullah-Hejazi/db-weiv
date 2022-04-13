@@ -49,12 +49,22 @@ export default {
         },
 
         async RefreshDatabase() {
+            this.error = ''
+
             this.$store.dispatch('refreshDatabases').then((result) => {
                 if (! result.success) {
                     this.error = result.error;
                 }
             })
-        }
+        },
+
+        async DeleteDatabase() {
+            this.$store.dispatch('deleteDatabase', this.database.SCHEMA_NAME).then((result) => {
+                if (! result.success) {
+                    this.error = result.error;
+                }
+            })
+        },
     }
 }
 
@@ -62,8 +72,6 @@ export default {
 
 <template>
     <div class="databases">
-        <Toast />
-
         <Breadcrumb :home="home" :model="items" />
 
         <div class="flex justify-content-center align-items-center my-3 text-2xl text-center">
@@ -80,12 +88,24 @@ export default {
             />
         </div>
 
-        <div class="flex flex-wrap justify-content-center mt-5">
-            <DatabaseItem class="mx-3" v-for="(db, index) in $store.state.database.databases" :key="index"
-                :index="index" :database="db" />
+        <div v-if="error" class="mx-5">
+            <InlineMessage severity="error" class="w-full scalein select-text">
+                {{ error }}
+            </InlineMessage>
         </div>
 
-        <Dialog header="Create new Database" v-model:visible="createDatabaseDialog" class="display-name-dialog text-sm">
+        <div class="flex flex-wrap justify-content-center mt-5">
+            <DatabaseItem
+                class="mx-3"
+                v-for="(database, index) in $store.state.database.databases"
+                :key="index"
+                :index="index"
+                :database="database"
+                :delete="DeleteDatabase"
+            />
+        </div>
+
+        <Dialog header="Create new Database" :modal="true" v-model:visible="createDatabaseDialog" class="display-name-dialog text-sm">
             <InlineMessage severity="error" v-if="newDBError" class="mb-3 w-full scalein">
                 {{ newDBError }}
             </InlineMessage>
@@ -105,9 +125,12 @@ export default {
 
             <template #footer>
                 <div class="flex justify-content-between">
-                    <Button label="Create" icon="pi pi-plus" @click="CreateDatabase"></Button>
-                    <Button label="Cancel" icon="pi pi-times" @click="createDatabaseDialog = false"
-                        class="p-button-text"></Button>
+                    <Button
+                        label="Cancel"
+                        @click="createDatabaseDialog = false"
+                        class="p-button-text"
+                    />
+                    <Button label="Create" @click="CreateDatabase" />
                 </div>
             </template>
         </Dialog>

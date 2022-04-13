@@ -2,10 +2,22 @@
 export default {
     name: 'DatabaseItem',
 
+    data () {
+        return {
+            items: [
+                {
+                    label: 'Drop',
+                    icon: 'pi pi-fw pi-trash',
+                    command: this.DeleteDatabaseDialog
+                }
+            ]
+        }
+    },
+
     props: [
         'index',
         'database',
-        'action'
+        'delete'
     ],
 
     methods: {
@@ -32,6 +44,21 @@ export default {
                 g: 255 * f(3),
                 b: 255 * f(1)
             }
+        },
+
+        ToggleDatabaseSettings(event) {
+            this.$refs.menu.toggle(event)
+        },
+
+        DeleteDatabaseDialog() {
+            this.$confirm.require({
+                header: 'Confirm Database Drop',
+                message: 'Are you sure you want to DROP the database, this process is irreversible?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptClass: 'p-button-danger',
+                rejectClass: 'p-button-plain p-button-text',
+                accept: this.delete
+            });
         }
     }
 }
@@ -51,9 +78,10 @@ export default {
             </div>
         </div>
 
-        <div class="px-3 py-3 text-400 flex justify-content-between">
+        <div class="px-3 py-3 text-400 flex justify-content-between align-items-center">
             <small>{{ database.DEFAULT_COLLATION_NAME }}</small>
-            <Button icon="pi pi-cog" class="p-button-rounded p-button-secondary p-button-text" />
+            <Button icon="pi pi-cog" class="p-button-rounded p-button-secondary p-button-text" @click="ToggleDatabaseSettings" />
+            <Menu id="menu" :model="items" ref="menu" :popup="true" />
         </div>
     </div>
 </template>

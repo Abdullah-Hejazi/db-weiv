@@ -29,6 +29,9 @@ export default {
 </script>
 
 <template>
+    <ConfirmDialog />
+    <Toast />
+
     <header>
         <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between" v-if="$store.state.database.connection">
             <div class="flex align-items-center">
@@ -38,7 +41,7 @@ export default {
             <div class="flex align-items-center">
                 <Button iconPos="right" icon="pi pi-angle-down" class="p-button-text p-button-plain" :label="$store.state.database.data.user" @click="ToggleProfileItems" />
 
-                <Menu id="menu" :model="userItems" ref="menu" :popup="true"></Menu>
+                <Menu id="menu" :model="userItems" ref="menu" :popup="true" />
             </div>
         </div>
     </header>

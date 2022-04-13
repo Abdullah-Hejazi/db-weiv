@@ -45,7 +45,14 @@ const database = {
             try {
                 context.commit('setConnection', await mysql.createPool(data))
 
-                await context.dispatch('refreshDatabases')
+                let result = await context.dispatch('refreshDatabases')
+
+                if (! result.success) {
+                    return {
+                        success: false,
+                        error: result.error
+                    }
+                }
                 
             } catch (e) {
                 error = e
@@ -85,7 +92,7 @@ const database = {
 
             try {
                 let connection = await context.state.connection.getConnection()
-                console.log(form.name)
+
                 await connection.query(
                     'CREATE DATABASE ?? CHARACTER SET ? COLLATE ?;',
                     [form.name, form.collation.CHARACTER_SET_NAME, form.collation.COLLATION_NAME]
