@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div>
-                <Button icon="pi pi-trash" class="p-button-text p-button-danger" @click="remove(index)" />
+                <Button icon="pi pi-trash" class="p-button-text p-button-rounded  p-button-danger" @click="remove(index)" />
             </div>
         </div>
     </div>

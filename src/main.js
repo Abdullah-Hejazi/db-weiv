@@ -1,5 +1,4 @@
 import { createApp } from "vue";
-import { createPinia } from "pinia";
 
 import PrimeVue from 'primevue/config';
 import 'primevue/resources/themes/md-dark-deeppurple/theme.css';
@@ -19,20 +18,27 @@ import Tooltip from 'primevue/tooltip';
 import Dialog from 'primevue/dialog';
 import InlineMessage from 'primevue/inlinemessage';
 import PanelMenu from 'primevue/panelmenu';
+import Panel from 'primevue/panel';
 import Divider from 'primevue/divider';
 import Toolbar from 'primevue/toolbar';
 import ProgressSpinner from 'primevue/progressspinner';
 import BlockUI from 'primevue/blockui';
+import Menu from 'primevue/menu';
+import Breadcrumb from 'primevue/breadcrumb';
+import Dropdown from 'primevue/dropdown';
+import ToastService from 'primevue/toastservice';
+import Toast from 'primevue/toast';
 
 
 import App from "./App.vue";
 import router from "./router";
+import store from '@/stores/store';
 
 const app = createApp(App);
 
-app.use(createPinia());
 app.use(router);
 app.use(PrimeVue);
+app.use(store);
 
 app.component('Menubar', Menubar);
 app.component('Card', Card);
@@ -49,7 +55,15 @@ app.component('Divider', Divider);
 app.component('Toolbar', Toolbar);
 app.component('ProgressSpinner', ProgressSpinner);
 app.component('BlockUI', BlockUI);
+app.component('Menu', Menu);
+app.component('Panel', Panel);
+app.component('Breadcrumb', Breadcrumb);
+app.component('Dropdown', Dropdown);
+// app.component('ToastService', ToastService);
+app.component('Toast', Toast);
+
 
 app.directive('Tooltip', Tooltip);
+app.use(ToastService);
 
 app.mount("#app");

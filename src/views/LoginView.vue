@@ -1,7 +1,4 @@
 <script>
-
-import { useDatabaseStore } from '@/stores/database'
-
 import AccountItem from '@/components/AccountItem'
 
 export default {
@@ -49,16 +46,9 @@ export default {
 
             this.error = ''
 
-            const database = useDatabaseStore()
-
             try {
                 this.Invoke(
-                    await database.Connect(
-                        data.host,
-                        data.username,
-                        data.password,
-                        data.port
-                    )
+                    await this.$store.dispatch('connect', data)
                 )
 
                 this.$router.push('/databases')
