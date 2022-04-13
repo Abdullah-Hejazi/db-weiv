@@ -1,16 +1,16 @@
 <script setup>
 import { RouterView } from "vue-router";
 
-
 const items = [
     {
         label: 'Login',
         icon: 'pi pi-user',
-        to: '/login'
+        to: '/'
     },
     {
         label: 'Register',
         icon: 'pi pi-users',
+        to: '/databases'
     }
 ];
 

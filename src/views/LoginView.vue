@@ -60,6 +60,8 @@ export default {
                         data.port
                     )
                 )
+
+                this.$router.push('/databases')
             } catch (error) {
                 this.error = error.message
             } finally {
