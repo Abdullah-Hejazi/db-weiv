@@ -18,7 +18,7 @@ export default {
             items: [],
 
             home: {
-                icon: 'pi pi-database',
+                icon: 'pi pi-server',
                 to: '/databases',
                 label: ' ' + this.$store.state.database.data.host
             },

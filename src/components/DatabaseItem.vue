@@ -74,7 +74,7 @@ export default {
         },
 
         SelectDatabase() {
-            console.log(this.database.SCHEMA_NAME)
+            this.$router.push('/databases/' + this.database.SCHEMA_NAME)
         }
     }
 }

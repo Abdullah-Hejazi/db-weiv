@@ -117,7 +117,7 @@ const database = {
             }
         },
 
-        async dropDatabase (context, scheme) {
+        async dropDatabase (context, schema) {
             let error = null
 
             try {
@@ -125,7 +125,7 @@ const database = {
 
                 await connection.query(
                     'DROP DATABASE ??;',
-                    [scheme]
+                    [schema]
                 )
 
                 let result = await context.dispatch('refreshDatabases')
@@ -144,6 +144,35 @@ const database = {
             return {
                 success: !error,
                 error: error?.message
+            }
+        },
+
+        async getDatabase (context, schema) {
+            let error = null
+            let result = []
+            let name = ''
+
+            try {
+                let connection = await context.state.connection.getConnection()
+
+                result = await connection.query(
+                    'USE ??; SHOW FULL TABLES;',
+                    [schema]
+                )
+
+                name = result[1][1][0].name
+
+                result = result[0][1]
+
+            } catch (e) {
+                error = e
+            }
+
+            return {
+                success: !error,
+                error: error?.message,
+                data: result,
+                name: name
             }
         },
 

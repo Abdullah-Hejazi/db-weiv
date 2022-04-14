@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 
 import PrimeVue from 'primevue/config';
-import 'primevue/resources/themes/arya-blue/theme.css';
+import 'primevue/resources/themes/vela-green/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
@@ -30,6 +30,9 @@ import ToastService from 'primevue/toastservice';
 import Toast from 'primevue/toast';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
+import ScrollPanel from 'primevue/scrollpanel';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 
 import App from "./App.vue";
@@ -65,6 +68,9 @@ app.component('Dropdown', Dropdown);
 app.component('Toast', Toast);
 // app.component('ConfirmationService', ConfirmationService);
 app.component('ConfirmDialog', ConfirmDialog);
+app.component('ScrollPanel', ScrollPanel);
+app.component('DataTable', DataTable);
+app.component('Column', Column);
 
 
 app.directive('Tooltip', Tooltip);
