@@ -10,7 +10,9 @@ export default {
                     icon: 'pi pi-fw pi-trash',
                     command: this.DeleteDatabaseDialog
                 }
-            ]
+            ],
+            deleteDatabaseDialog: false,
+            hovered: false
         }
     },
 
@@ -29,7 +31,9 @@ export default {
 
             total += shift
 
-            let color = this.CalculateColor(total % 360, 62, 67)
+            let b = this.hovered ? 72 : 67;
+
+            let color = this.CalculateColor(total % 360, 62, b)
 
             return `rgb(${color.r}, ${color.g}, ${color.b})`
         },
@@ -51,24 +55,35 @@ export default {
         },
 
         DeleteDatabaseDialog() {
+            this.deleteDatabaseDialog = true
+        },
+
+        DeleteDatabaseDoubleCheck() {
+            this.deleteDatabaseDialog = false
             this.$confirm.require({
-                header: 'Confirm Database Drop',
-                message: 'Are you sure you want to DROP the database, this process is irreversible?',
+                header: 'Area you really sure ?',
+                message: 'The process of DROPPING the database [' + this.database.SCHEMA_NAME + '] is irreversible, Do you want to procceed?',
                 icon: 'pi pi-exclamation-triangle',
                 acceptClass: 'p-button-danger',
                 rejectClass: 'p-button-plain p-button-text',
-                accept: this.delete
+                autofocus: false,
+                accept: () => {
+                    this.delete(this.database)
+                }
             });
+        },
+
+        SelectDatabase() {
+            console.log(this.database.SCHEMA_NAME)
         }
     }
 }
 </script>
 
 <template>
-    <div class="db-item border-round surface-overlay shadow-2 cursor-pointer mb-4" 
-        v-tooltip.bottom="database.SCHEMA_NAME">
+    <div class="db-item border-round surface-overlay shadow-2 mb-4">
 
-        <div class="px-3 border-round shadow-3 py-4" :style="{ backgroundImage: 'linear-gradient(to right, ' + GetColor() + ', ' + GetColor(30) }">
+        <div @mouseover="hovered = true" @mouseleave="hovered = false" @click="SelectDatabase" class="px-3 border-round shadow-3 py-4 cursor-pointer opacity-100" :style="{ backgroundImage: 'linear-gradient(to right, ' + GetColor() + ', ' + GetColor(30) }">
             <div class="flex flex-wrap align-items-center">
                 <div class="mr-3">
                     <img src="@/assets/db.png" height="80">
@@ -83,6 +98,18 @@ export default {
             <Button icon="pi pi-cog" class="p-button-rounded p-button-secondary p-button-text" @click="ToggleDatabaseSettings" />
             <Menu id="menu" :model="items" ref="menu" :popup="true" />
         </div>
+
+        <Dialog :draggable="false" :modal="true" header="Delete the database ?" class="db-dialog" v-model:visible="deleteDatabaseDialog" >
+            <InlineMessage severity="error" class="mb-3 w-full">
+                Are you sure you want to DROP the <pre class="inline"> {{ database.SCHEMA_NAME }} </pre> database ?
+            </InlineMessage>
+
+            <template #footer>
+                <Button label="Cancel" @click="deleteDatabaseDialog = false" class="p-button-text p-button-plain" />
+                <Button label="Delete" @click="DeleteDatabaseDoubleCheck" class="p-button-danger" />
+            </template>
+        </Dialog>
+
     </div>
 </template>
 
@@ -95,5 +122,10 @@ export default {
 .db-title {
     text-shadow: 1px 1px #464646;
     max-width: 90%;
+}
+
+.db-dialog {
+    width: 600px;
+    max-width: 90vw;
 }
 </style>

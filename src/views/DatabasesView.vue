@@ -58,9 +58,16 @@ export default {
             })
         },
 
-        async DeleteDatabase() {
-            this.$store.dispatch('deleteDatabase', this.database.SCHEMA_NAME).then((result) => {
-                if (! result.success) {
+        async DeleteDatabase(database) {
+            this.$store.dispatch('dropDatabase', database.SCHEMA_NAME).then((result) => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Database Dropped Successfully',
+                        detail:'Database has been dropped successfully',
+                        life: 3000
+                    });
+                } else {
                     this.error = result.error;
                 }
             })

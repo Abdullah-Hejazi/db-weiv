@@ -168,7 +168,7 @@ export default {
                 </div>
 
                 <div class="text-center mt-3">
-                    <Button label="Login" class="w-full" @click="Login" />
+                    <Button label="Login" class="login-button" @click="Login" />
                     
                     <div class="flex justify-content-between">
                         <Button
@@ -258,6 +258,11 @@ export default {
 .loginData-card {
     width: 550px;
     max-width: 90vw;
+}
+
+.login-button {
+    width: 200px;
+    max-width: 100%;
 }
 
 .loginData-margin {

@@ -98,7 +98,44 @@ const database = {
                     [form.name, form.collation.CHARACTER_SET_NAME, form.collation.COLLATION_NAME]
                 )
 
-                await context.dispatch('refreshDatabases')
+                let result = await context.dispatch('refreshDatabases')
+
+                if (! result.success) {
+                    return {
+                        success: false,
+                        error: result.error
+                    }
+                }
+
+            } catch (e) {
+                error = e
+            }
+
+            return {
+                success: !error,
+                error: error?.message
+            }
+        },
+
+        async dropDatabase (context, scheme) {
+            let error = null
+
+            try {
+                let connection = await context.state.connection.getConnection()
+
+                await connection.query(
+                    'DROP DATABASE ??;',
+                    [scheme]
+                )
+
+                let result = await context.dispatch('refreshDatabases')
+
+                if (! result.success) {
+                    return {
+                        success: false,
+                        error: result.error
+                    }
+                }
 
             } catch (e) {
                 error = e
