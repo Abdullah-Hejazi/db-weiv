@@ -33,6 +33,7 @@ const database = {
     actions: {
         async connect(context, form) {
             context.dispatch('clearConnection')
+
             let data = {
                 host: form.host,
                 user: form.username,
@@ -44,12 +45,13 @@ const database = {
             let error = null
 
             try {
-                context.commit('setConnection', await mysql.createPool(data))
+                let pool = await mysql.createPool(data);
 
-                let connection = await context.state.connection.getConnection()
+                context.commit('setConnection', pool)
+
+                let connection = await pool.getConnection()
 
                 await connection.query('SELECT 1;')
-
 
                 context.commit('setData', data)
 
