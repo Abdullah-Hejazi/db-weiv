@@ -16,12 +16,16 @@ export default {
 
     methods: {
         Logout() {
-            this.$store.dispatch('clearConnection');
+            this.$store.dispatch('database/clearConnection');
             this.$router.push('/');
         },
 
         ToggleProfileItems(event) {
             this.$refs.menu.toggle(event)
+        },
+
+        Home() {
+            this.$router.push('/databases')
         }
     },
 }
@@ -33,13 +37,13 @@ export default {
     <Toast />
 
     <header>
-        <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between" v-if="$store.state.database.connection">
+        <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between" v-if="$store.state.database.data">
             <div class="flex align-items-center">
-                <img alt="logo" src="@/assets/logo.png" height="28" class="mr-2">
+                <img alt="logo" src="@/assets/logo.png" height="28" class="mr-2 cursor-pointer" @click="Home">
             </div>
 
             <div class="flex align-items-center">
-                <Button iconPos="right" icon="pi pi-angle-down" class="p-button-text p-button-plain" :label="$store.state.database.data.user" @click="ToggleProfileItems" />
+                <Button iconPos="right" icon="pi pi-angle-down" class="p-button-text p-button-plain" :label="$store.state.database.data?.user" @click="ToggleProfileItems" />
 
                 <Menu id="menu" :model="userItems" ref="menu" :popup="true" />
             </div>

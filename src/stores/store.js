@@ -1,5 +1,5 @@
 import database from '@/stores/database'
-import { createStore } from 'vuex';
+import { createStore } from 'vuex'
 
 const store = createStore({
     modules: {

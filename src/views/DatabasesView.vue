@@ -20,7 +20,7 @@ export default {
             home: {
                 icon: 'pi pi-server',
                 to: '/databases',
-                label: ' ' + this.$store.state.database.data.host
+                label: ' ' + this.$store.state.database.data?.host
             },
 
             newDBError: '',
@@ -30,9 +30,13 @@ export default {
         }
     },
 
+    mounted () {
+        this.RefreshDatabase()
+    },
+
     methods: {
         async CreateDatabase() {
-            this.$store.dispatch('createDatabase', this.newDatabase).then((result) => {
+            this.$store.dispatch('database/createDatabase', this.newDatabase).then((result) => {
                 if (result.success) {
                     this.newDatabase.name = '';
                     this.createDatabaseDialog = false;
@@ -51,7 +55,9 @@ export default {
         async RefreshDatabase() {
             this.error = ''
 
-            this.$store.dispatch('refreshDatabases').then((result) => {
+            this.home.label = ' ' + this.$store.state.database.data?.host
+
+            this.$store.dispatch('database/refreshDatabases').then((result) => {
                 if (! result.success) {
                     this.error = result.error;
                 }
@@ -59,7 +65,7 @@ export default {
         },
 
         async DeleteDatabase(database) {
-            this.$store.dispatch('dropDatabase', database.SCHEMA_NAME).then((result) => {
+            this.$store.dispatch('database/dropDatabase', database.SCHEMA_NAME).then((result) => {
                 if (result.success) {
                     this.$toast.add({
                         severity:'success',
@@ -81,18 +87,22 @@ export default {
     <div class="databases">
         <Breadcrumb :home="home" :model="items" />
 
-        <div class="flex justify-content-center align-items-center my-3 text-2xl text-center">
+        <div class="text-center text-2xl my-3">
             <div>Databases</div>
-            <Button
-                icon="pi pi-plus"
-                class="ml-3 p-button-text p-button-primary p-button-rounded"
-                @click="createDatabaseDialog = true"
-            />
-            <Button
-                icon="pi pi-refresh"
-                class="p-button-text p-button-secondary p-button-rounded"
-                @click="RefreshDatabase"
-            />
+            <div class="flex justify-content-center align-items-center mt-1">
+                <Button
+                    icon="pi pi-plus"
+                    label="Create Database"
+                    class="ml-3 p-button-text p-button-primary"
+                    @click="createDatabaseDialog = true"
+                />
+                <Button
+                    icon="pi pi-refresh"
+                    label="Refresh Databases"
+                    class="p-button-text p-button-secondary"
+                    @click="RefreshDatabase"
+                />
+            </div>
         </div>
 
         <div v-if="error" class="mx-5">

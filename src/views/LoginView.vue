@@ -48,7 +48,7 @@ export default {
 
             try {
                 this.Invoke(
-                    await this.$store.dispatch('connect', data)
+                    await this.$store.dispatch('database/connect', data)
                 )
 
                 this.$router.push('/databases')

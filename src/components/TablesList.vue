@@ -48,7 +48,7 @@ export default {
                 }
             ],
 
-            createTableDialog: true
+            createTableDialog: false
         }
     },
 
@@ -59,7 +59,8 @@ export default {
         'create',
         'sql',
         'export',
-        'import'
+        'import',
+        'engines'
     ],
 
     methods: {
@@ -67,7 +68,8 @@ export default {
             this.$refs.menu.toggle(event);
         },
 
-        closeCreateTableDialog() {
+        finishCreatingTable() {
+            this.refresh()
             this.createTableDialog = false
         }
     }
@@ -95,7 +97,7 @@ export default {
         </Panel>
 
         <Dialog class="create-table-modal" header="Create Table" v-model:visible="createTableDialog" :modal="true">
-            <CreateTableDialog :finish="closeCreateTableDialog" />
+            <CreateTableDialog :finish="finishCreatingTable" :engines="engines" />
         </Dialog>
     </div>
 </template>

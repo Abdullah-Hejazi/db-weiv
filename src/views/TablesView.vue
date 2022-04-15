@@ -28,6 +28,7 @@ export default {
             tables: [],
             views: [],
             sysViews: [],
+            engines: [],
 
             database: ''
         }
@@ -35,10 +36,13 @@ export default {
 
     methods: {
         RefreshTables() {
-            this.$store.dispatch('getDatabase', this.$route.params.database).then((result) => {
+            this.error = ''
+
+            this.$store.dispatch('database/getDatabase', this.$route.params.database).then((result) => {
                 this.tables = []
                 this.views = []
                 this.sysViews = []
+                this.engines = []
 
                 if (! result.success) {
                     this.error = result.error
@@ -57,7 +61,11 @@ export default {
                             this.sysViews.push(temp)
                         }
                     })
+
+                    this.engines = result.engines
                 }
+            }).catch((error) => {
+                this.error = error
             })
         }
     },
@@ -66,26 +74,7 @@ export default {
         this.database = this.$route.params.database
         this.items[0].label = this.database
 
-        this.$store.dispatch('getDatabase', this.$route.params.database).then((result) => {
-            if (! result.success) {
-                this.error = result.error
-            } else {
-                result.data.forEach((item) => {
-                    let temp = {
-                        label: item[result.name],
-                        icon: 'pi pi-table',
-                    }
-
-                    if (item.Table_type === 'BASE TABLE') {
-                        this.tables.push(temp)
-                    } else if (item.Table_type === 'VIEW') {
-                        this.views.push(temp)
-                    } else if (item.Table_type === 'SYSTEM VIEW') {
-                        this.sysViews.push(temp)
-                    }
-                })
-            }
-        })
+        this.RefreshTables()
     },
 
     computed: {
@@ -135,7 +124,7 @@ export default {
     <div class="tables">
         <Breadcrumb :home="home" :model="items" :exact="false" />
 
-        <div v-if="error" class="mx-5">
+        <div v-if="error" class="mx-5 mt-5">
             <InlineMessage severity="error" class="w-full scalein select-text">
                 {{ error }}
             </InlineMessage>
@@ -146,6 +135,7 @@ export default {
                 class="col-4 mt-3 p-0"
                 :database="database"
                 :data="data"
+                :engines="engines"
                 :refresh="RefreshTables"
             />
         </div>
