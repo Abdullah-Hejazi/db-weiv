@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise'
+// import mysql from 'mysql2/promise'
+import dbservice from '@/services/dbservice'
 
 const database = {
     namespaced: true,
 
     state() {
         return {
-            connection: null,
+            connected: false,
             data: null,
             databases: [],
             collations: []
@@ -13,8 +14,8 @@ const database = {
     },
 
     mutations: {
-        setConnection(state, connection) {
-            state.connection = connection
+        setConnected(state, connected) {
+            state.connected = connected
         },
 
         setData(state, data) {
@@ -32,7 +33,7 @@ const database = {
 
     actions: {
         async connect(context, form) {
-            context.dispatch('clearConnection')
+            await context.dispatch('clearConnection')
 
             let data = {
                 host: form.host,
@@ -45,15 +46,13 @@ const database = {
             let error = null
 
             try {
-                let pool = await mysql.createPool(data);
+                await dbservice.createConnection(data)
 
-                context.commit('setConnection', pool)
-
-                let connection = await pool.getConnection()
-
+                let connection = await dbservice.getConnection();
                 await connection.query('SELECT 1;')
 
                 context.commit('setData', data)
+                context.commit('setConnected', true)
 
             } catch (e) {
                 error = e
@@ -69,11 +68,10 @@ const database = {
             let error = null
 
             try {
-                let connection = await context.state.connection.getConnection()
+                let connection = await dbservice.getConnection();
 
                 let [result] = await connection.query('SELECT * FROM information_schema.SCHEMATA; SELECT * FROM information_schema.COLLATIONS;')
 
-                console.log('Worked')
                 context.commit('setDatabases', result[0])
                 context.commit('setCollations', result[1])
 
@@ -91,7 +89,7 @@ const database = {
             let error = null
 
             try {
-                let connection = await context.state.connection.getConnection()
+                let connection = await dbservice.getConnection();
 
                 await connection.query(
                     'CREATE DATABASE ?? CHARACTER SET ? COLLATE ?;',
@@ -121,7 +119,7 @@ const database = {
             let error = null
 
             try {
-                let connection = await context.state.connection.getConnection()
+                let connection = await dbservice.getConnection();
 
                 await connection.query(
                     'DROP DATABASE ??;',
@@ -154,7 +152,7 @@ const database = {
             let engines = []
 
             try {
-                let connection = await context.state.connection.getConnection()
+                let connection = await dbservice.getConnection();
 
                 result = await connection.query(
                     'USE ??; SHOW FULL TABLES; SHOW ENGINES;',
@@ -313,9 +311,10 @@ const database = {
             }
         },
 
-        clearConnection(context) {
+        async clearConnection(context) {
             context.commit('setData', null)
-            context.commit('setConnection', null)
+            context.commit('setConnected', false)
+            await dbservice.endConnection();
         }
     },
 }

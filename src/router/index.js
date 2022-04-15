@@ -38,13 +38,13 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
     if (to.meta.requiresAuth) {
-        if (!store.state.database.connection) {
+        if (!store.state.database.connected) {
             return '/'
         }
     }
 
     if (! to.meta.requiresAuth) {
-        if (store.state.database.connection) {
+        if (store.state.database.connected) {
             return '/databases'
         }
     }

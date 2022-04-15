@@ -37,7 +37,7 @@ export default {
     <Toast />
 
     <header>
-        <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between" v-if="$store.state.database.data">
+        <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between" v-if="$store.state.database.connected">
             <div class="flex align-items-center">
                 <img alt="logo" src="@/assets/logo.png" height="28" class="mr-2 cursor-pointer" @click="Home">
             </div>
