@@ -9,6 +9,10 @@ export default {
         ColumnDialog
     },
 
+    props: [
+        'finish'
+    ],
+
     data () {
         return {
             table: {
@@ -25,8 +29,8 @@ export default {
                     header: 'Type'
                 },
                 {
-                    field: 'default',
-                    header: 'Default'
+                    field: 'index',
+                    header: 'Index'
                 }
             ],
 
@@ -34,18 +38,49 @@ export default {
 
             columnDialog: {
                 active: false,
-                header: 'New Column'
-            }
+                header: 'New Column',
+                button: 'Add Column',
+                column: null,
+                func: null,
+                id: -1
+            },
+
+            loading: false
         }
     },
 
     methods: {
-        ModifyColumn (index) {
-            console.log(index)
+        AddColumnDialog () {
+            this.columnDialog.id = -1
+            this.columnDialog.header = 'New Column'
+            this.columnDialog.button = 'Add Column'
+            this.columnDialog.column = null
+            this.columnDialog.func = this.AddColumn
+            this.columnDialog.active = true
+
+        },
+
+        EditColumnDialog (index) {
+            this.columnDialog.id = index
+            this.columnDialog.header = 'Edit Column'
+            this.columnDialog.button = 'Edit Column'
+            this.columnDialog.column = this.columns[index]
+            this.columnDialog.func = this.EditColumn
+            this.columnDialog.active = true
         },
 
         RemoveColumn (index) {
             this.columns.splice(index, 1)
+        },
+
+        AddColumn (column) {
+            this.columns.push(column)
+            this.columnDialog.active = false
+        },
+
+        EditColumn (column, id) {
+            this.columns[id] = column
+            this.columnDialog.active = false
         },
 
         onRowReorder (e) {
@@ -53,6 +88,12 @@ export default {
 
             this.columns[e.dragIndex] = this.columns[e.dropIndex]
             this.columns[e.dropIndex] = temp
+        },
+
+        async CreateTable () {
+            this.loading = true
+            console.log('here')
+            // this.finish()
         }
     }
 }
@@ -71,7 +112,7 @@ export default {
                     class="p-button-outlined"
                     icon="pi pi-plus"
                     label="Add Column"
-                    @click="columnDialog.active = true"
+                    @click="AddColumnDialog"
                 />
             </div>
         </div>
@@ -97,7 +138,7 @@ export default {
 
             <Column header="Edit Column">
                 <template #body="{index}">
-                    <Button class="p-button-text p-button-rounded" icon="pi pi-pencil" @click="ModifyColumn(index)" />
+                    <Button class="p-button-text p-button-rounded" icon="pi pi-pencil" @click="EditColumnDialog(index)" />
                     <Button class="p-button-text p-button-rounded p-button-danger" icon="pi pi-trash" @click="RemoveColumn(index)" />
                 </template>
             </Column>
@@ -106,14 +147,25 @@ export default {
                 <div class="text-center">
                     <h4 class="m-0">
                         No columns found
-                        <span class="text-primary cursor-pointer" @click="columnDialog.active = true"> Add Column </span>
+                        <span class="text-primary cursor-pointer" @click="AddColumnDialog"> Add Column </span>
                     </h4>
                 </div>
             </template>
         </DataTable>
 
-        <Dialog class="create-table-modal" :modal="true" v-model:visible="columnDialog.active" :header="columnDialog.header">
-            <ColumnDialog />
+        <div class="text-center mt-4">
+            <Button :loading="loading" @click="CreateTable" label="Create Table" style="width: 300px; max-width: 100%;" />
+        </div>
+
+        <Dialog class="column-dialog" :modal="true" v-model:visible="columnDialog.active" :header="columnDialog.header">
+            <ColumnDialog :id="columnDialog.id" :column="columnDialog.column" :finish="columnDialog.func" :label="columnDialog.button" />
         </Dialog>
     </div>
 </template>
+
+<style>
+.column-dialog {
+    width: 500px;
+    max-width: 95vw;
+}
+</style>

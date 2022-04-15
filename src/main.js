@@ -35,6 +35,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
 
+
 import App from "./App.vue";
 import router from "./router";
 import store from '@/stores/store';

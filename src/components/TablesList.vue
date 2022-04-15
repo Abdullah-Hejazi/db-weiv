@@ -65,6 +65,10 @@ export default {
     methods: {
         toggle () {
             this.$refs.menu.toggle(event);
+        },
+
+        closeCreateTableDialog() {
+            this.createTableDialog = false
         }
     }
 }
@@ -91,7 +95,7 @@ export default {
         </Panel>
 
         <Dialog class="create-table-modal" header="Create Table" v-model:visible="createTableDialog" :modal="true">
-            <CreateTableDialog />
+            <CreateTableDialog :finish="closeCreateTableDialog" />
         </Dialog>
     </div>
 </template>
