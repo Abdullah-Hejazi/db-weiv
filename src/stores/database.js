@@ -46,17 +46,12 @@ const database = {
             try {
                 context.commit('setConnection', await mysql.createPool(data))
 
-                let result = await context.dispatch('refreshDatabases')
+                let connection = await context.state.connection.getConnection()
 
-                if (!result.success) {
-                    return {
-                        success: false,
-                        error: result.error
-                    }
-                }
+                await connection.query('SELECT 1;')
+
 
                 context.commit('setData', data)
-                console.log(context.state.data)
 
             } catch (e) {
                 error = e
@@ -76,6 +71,7 @@ const database = {
 
                 let [result] = await connection.query('SELECT * FROM information_schema.SCHEMATA; SELECT * FROM information_schema.COLLATIONS;')
 
+                console.log('Worked')
                 context.commit('setDatabases', result[0])
                 context.commit('setCollations', result[1])
 

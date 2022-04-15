@@ -170,7 +170,6 @@ export default {
                     this.error = result.error
                 }
             }).catch(error => {
-                console.log(error)
                 this.error = error.message
             }).finally(() => {
                 this.loading = false
