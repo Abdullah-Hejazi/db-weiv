@@ -76,32 +76,25 @@ export default {
         },
 
         async SelectTheme() {
-            if (this.theme && this.themes.includes(this.theme)) {
-                localStorage.setItem('theme', this.theme)
+            this.themes.forEach(theme => {
+                document.getElementById(theme).rel = '';
+            })
 
-                let link = document.createElement('link');
-                link.rel = "stylesheet";
-                link.href = '/themes/' + this.theme + '.css';
-                document.head.appendChild(link);
-            } else {
-                let link = document.createElement('link');
-                link.rel = "stylesheet";
-                link.href = '/themes/arya-purple.css';
-                link.setAttribute('data-theme', this.theme);
-                document.head.appendChild(link);
+            document.getElementById(this.theme).rel = 'stylesheet';
 
-                localStorage.removeItem('theme')
-            }
-
-            let oldThemes = document.querySelectorAll('[data-theme]');
-
-            for (let i = 0; i < oldThemes.length - 1; i++) {
-                oldThemes[i].remove();
-            }
+            localStorage.setItem('theme', this.theme);
         }
     },
 
     created() {
+        this.themes.forEach(theme => {
+            let link = document.createElement('link');
+            link.rel = "";
+            link.id = theme;
+            link.href = '/themes/' + theme + '.css';
+            document.head.appendChild(link);
+        })
+
         this.theme = localStorage.getItem('theme')
         this.SelectTheme()
     }
