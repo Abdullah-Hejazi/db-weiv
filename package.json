@@ -16,7 +16,6 @@
   },
   "main": "background.js",
   "dependencies": {
-    "@electron/remote": "^2.0.8",
     "@vue/cli-service": "^5.0.4",
     "cardinal": "^2.1.1",
     "mysql2": "^2.3.3",

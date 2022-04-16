@@ -4,7 +4,7 @@ import TablesList from '@/components/TablesList'
 import TableData from '@/components/TableData'
 
 export default {
-    name: 'TablesView',
+    name: 'DatabaseView',
 
     components: {
         TablesList,
@@ -150,7 +150,7 @@ export default {
                     :engines="engines"
                     :refresh="RefreshTables"
                     :load="LoadTable"
-            />
+                />
             </div>
 
             <div class="col-12 md:col-8 lg:col-9 xl:col-10 mt-3 p-0 sm:pl-3" v-if="table">
@@ -161,9 +161,12 @@ export default {
 </template>
 
 <style>
-
 .scroll-menu {
-    height: calc(100vh - 280px);
+    height: calc(100vh - 300px);
+}
+
+.scroll-menu2 {
+    height: calc(100vh - 320px);
 }
 
 </style>

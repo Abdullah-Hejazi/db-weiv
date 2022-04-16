@@ -33,7 +33,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import ScrollPanel from 'primevue/scrollpanel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-
+import TabMenu from 'primevue/tabmenu';
 
 
 import App from "./App.vue";
@@ -72,6 +72,7 @@ app.component('ConfirmDialog', ConfirmDialog);
 app.component('ScrollPanel', ScrollPanel);
 app.component('DataTable', DataTable);
 app.component('Column', Column);
+app.component('TabMenu', TabMenu);
 
 
 app.directive('Tooltip', Tooltip);

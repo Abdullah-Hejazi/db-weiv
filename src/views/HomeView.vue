@@ -2,7 +2,7 @@
 import DatabaseItem from '@/components/DatabaseItem';
 
 export default {
-    name: 'DatabasesView',
+    name: 'HomeView',
 
     components: {
         DatabaseItem

@@ -326,6 +326,32 @@ const database = {
             }
         },
 
+        async loadTable(context, form) {
+            let error = null
+            let result = []
+
+            try {
+                let connection = await dbservice.getConnection();
+
+                let perPage = form.perPage ? form.perPage : 25
+                let offset = form.page ? (form.page - 1) * perPage : 0
+
+                result = await connection.query(
+                    'SELECT * FROM ??.?? LIMIT ? OFFSET ?',
+                    [form.database, form.table, perPage, offset]
+                )
+
+            } catch (e) {
+                error = e
+            }
+
+            return {
+                success: !error,
+                error: error?.message,
+                data: result
+            }
+        },
+
         async clearConnection(context) {
             context.commit('setData', null)
             context.commit('setConnected', false)

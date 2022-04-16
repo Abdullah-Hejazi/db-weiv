@@ -1,4 +1,5 @@
-<script>
+<script>import M from "minimatch"
+
 
 export default {
     name: 'TableData',
@@ -9,12 +10,16 @@ export default {
                 {
                     label: 'Table',
                     icon: 'pi pi-table',
+                    command: this.LoadTable
                 },
                 {
                     label: 'Structure',
                     icon: 'pi pi-database',
+                    command: this.LoadStructure
                 }
-            ]
+            ],
+
+            activeIndex: 0
         }
     },
 
@@ -22,7 +27,27 @@ export default {
         'table',
     ],
 
-    methods: {
+    mounted () {
+        this.LoadTable()
+    },
+
+    methods : {
+        LoadTable() {
+            this.activeIndex = 0
+            this.$router.push('/databases/' + this.$route.params.database + '/' + this.table)
+        },
+
+        LoadStructure() {
+            this.activeIndex = 1
+            this.$router.push('/databases/' + this.$route.params.database + '/' + this.table + '/structure')
+        }
+    },
+
+    // watch table change
+    watch: {
+        table: function() {
+            this.LoadTable()
+        }
     }
 }
 </script>
@@ -31,7 +56,7 @@ export default {
     <div>
         <Panel>
             <template #header>
-                <Menubar :model="items" />
+                <TabMenu :model="items" :activeIndex="activeIndex" />
             </template>
 
             <template #icons>
@@ -40,8 +65,8 @@ export default {
                 </Button>
             </template>
 
-            <ScrollPanel class="w-full scroll-menu" v-if="table">
-                
+            <ScrollPanel class="w-full scroll-menu2">
+                <router-view />
             </ScrollPanel>
         </Panel>
     </div>

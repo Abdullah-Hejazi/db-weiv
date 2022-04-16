@@ -1,7 +1,9 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import DatabasesView from "../views/DatabasesView.vue";
+import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
-import TablesView from "../views/TablesView.vue";
+import DatabaseView from "../views/DatabaseView.vue";
+import TableView from "../views/TableView.vue";
+import StructureView from "../views/StructureView.vue";
 import store from '@/stores/store'
 
 
@@ -19,7 +21,7 @@ const router = createRouter({
         {
             path: "/databases",
             name: "databases",
-            component: DatabasesView,
+            component: HomeView,
             meta: {
                 requiresAuth: true
             }
@@ -27,10 +29,20 @@ const router = createRouter({
         {
             path: "/databases/:database",
             name: "tables",
-            component: TablesView,
+            component: DatabaseView,
             meta: {
                 requiresAuth: true
-            }
+            },
+            children: [
+                {
+                    path: ':table',
+                    component: TableView
+                },
+                {
+                    path: ':table/structure',
+                    component: StructureView
+                }
+            ]
         },
     ],
 });
