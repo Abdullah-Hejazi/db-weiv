@@ -176,6 +176,7 @@ const database = {
             }
         },
 
+        // this thing needs refactoring lol
         async createTable(context, form) {
             let result = []
             let error = null
@@ -260,8 +261,14 @@ const database = {
 
                     query += (form.columns[i].isNull ? '' : 'NOT NULL') + ' ' + (form.columns[i].autoIncrement ? 'AUTO_INCREMENT' : '') + ' ';
 
-                    query += ((form.columns[i].defaultValue && form.columns[i].defaultValue != 'None') ? 'DEFAULT \'' + form.columns[i].defaultValue + '\'' : '') + ' ';
+                    // query += ((form.columns[i].defaultValue && form.columns[i].defaultValue != 'None' && form.columns[i].defaultValue != 'NULL') ? 'DEFAULT \'' + form.columns[i].defaultValue + '\'' : '') + ' ';
                     
+                    if (form.columns[i].defaultValue == 'CURRENT_TIMESTAMP') {
+                        query += 'DEFAULT ' + form.columns[i].defaultValue + ' ';
+                    } else if (form.columns[i].defaultValue != 'None' && form.columns[i].defaultValue != 'NULL') {
+                        query += 'DEFAULT \'' + form.columns[i].defaultValue + '\'' + ' ';
+                    }
+
                     query +=  (form.columns[i].index == 'PRIMARY KEY' ? 'PRIMARY KEY' : '') + ' ' + (i < form.columns.length - 1 ? ', ' : '');
                 }
 
@@ -292,9 +299,17 @@ const database = {
                     data.push(fulltexts[i])
                 }
 
-                query += ')';
+                query += ') ';
 
-                let connection = await context.state.connection.getConnection()
+                if (form.engine) {
+                    query += 'ENGINE = ' + form.engine.Engine + ' ';
+                }
+
+                if (form.collation) {
+                    query += 'CHARACTER SET ' + form.collation.CHARACTER_SET_NAME + ' COLLATE ' + form.collation.COLLATION_NAME + ' ';
+                }
+
+                let connection = await dbservice.getConnection();
 
                 result = await connection.query(
                     query,

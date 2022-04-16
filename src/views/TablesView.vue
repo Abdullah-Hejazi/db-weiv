@@ -1,12 +1,14 @@
 <script>
 
 import TablesList from '@/components/TablesList'
+import TableData from '@/components/TableData'
 
 export default {
     name: 'TablesView',
 
     components: {
-        TablesList
+        TablesList,
+        TableData
     },
 
     data() {
@@ -30,7 +32,8 @@ export default {
             sysViews: [],
             engines: [],
 
-            database: ''
+            database: '',
+            table: ''
         }
     },
 
@@ -47,10 +50,11 @@ export default {
                 if (! result.success) {
                     this.error = result.error
                 } else {
-                    result.data.forEach((item) => {
+                    result.data.forEach((item, index) => {
                         let temp = {
                             label: item[result.name],
                             icon: 'pi pi-table',
+                            index: index
                         }
 
                         if (item.Table_type === 'BASE TABLE') {
@@ -67,6 +71,14 @@ export default {
             }).catch((error) => {
                 this.error = error
             })
+        },
+
+        LoadTable(name) {
+            this.items[1] = {
+                label: name
+            }
+
+            this.table = name
         }
     },
 
@@ -130,17 +142,28 @@ export default {
             </InlineMessage>
         </div>
 
-        <div class="p-0 flex justify-content-start">
-            <TablesList
-                class="col-4 mt-3 p-0"
-                :database="database"
-                :data="data"
-                :engines="engines"
-                :refresh="RefreshTables"
+        <div class="p-0 md:flex justify-content-start">
+            <div class="col-12 md:col-4 lg:col-3 xl:col-2 mt-3 p-0">
+                <TablesList
+                    :database="database"
+                    :data="data"
+                    :engines="engines"
+                    :refresh="RefreshTables"
+                    :load="LoadTable"
             />
+            </div>
+
+            <div class="col-12 md:col-8 lg:col-9 xl:col-10 mt-3 p-0 sm:pl-3" v-if="table">
+                <TableData :table="table" />
+            </div>
         </div>
     </div>
 </template>
 
 <style>
+
+.scroll-menu {
+    height: calc(100vh - 280px);
+}
+
 </style>

@@ -9,7 +9,7 @@ export default {
         CreateTableDialog
     },
 
-    data () {
+    data() {
         return {
             items: [
                 {
@@ -43,6 +43,10 @@ export default {
                         {
                             label: 'Import',
                             icon: 'pi pi-upload'
+                        },
+                        {
+                            label: 'Settings',
+                            icon: 'pi pi-cog'
                         }
                     ]
                 }
@@ -60,17 +64,30 @@ export default {
         'sql',
         'export',
         'import',
-        'engines'
+        'engines',
+        'load'
     ],
 
     methods: {
-        toggle () {
+        ToggleMenu() {
             this.$refs.menu.toggle(event);
         },
 
-        finishCreatingTable() {
+        FinishTableCreation() {
             this.refresh()
             this.createTableDialog = false
+        },
+
+        LoadTable(table) {
+            for(let i = 0; i < this.data.length; i++) {
+                for (let j = 0; j < this.data[i].items?.length; j++) {
+                    this.data[i].items[j].selected = false
+                }
+            }
+
+            table.selected = true
+
+            this.load(table.label)
         }
     }
 }
@@ -80,14 +97,21 @@ export default {
     <div>
         <Panel :header="database">
             <template #icons>
-                <Button class="p-panel-header-icon p-link mr-2" @click="toggle">
+                <Button class="p-panel-header-icon p-link mr-2" @click="ToggleMenu">
                     <span class="pi pi-cog"></span>
                 </Button>
                 <Menu id="config_menu" ref="menu" :model="items" :popup="true"></Menu>
             </template>
 
             <ScrollPanel class="w-full scroll-menu" v-if="data.length > 0">
-                <Menu :model="data" class="w-full" />
+                <Menu :model="data" class="w-full">
+                    <template #item="{ item }">
+                        <div :class="'p-menuitem-link pl-4 ' + (item.selected ? 'text-primary' : 'text-700')" v-if="! item.items" @click="LoadTable(item)">
+                            <span class="pi pi-angle-right mt-1 mr-2" />
+                            {{ item.label }}
+                        </div>
+                    </template>
+                </Menu>
             </ScrollPanel>
 
             <div v-if="data.length == 0" class="text-center">
@@ -97,16 +121,12 @@ export default {
         </Panel>
 
         <Dialog class="create-table-modal" header="Create Table" v-model:visible="createTableDialog" :modal="true">
-            <CreateTableDialog :finish="finishCreatingTable" :engines="engines" />
+            <CreateTableDialog :finish="FinishTableCreation" :engines="engines" />
         </Dialog>
     </div>
 </template>
 
 <style>
-.scroll-menu {
-    height: calc(100vh - 280px);
-}
-
 .create-table-modal {
     width: 650px;
     max-width: 95vw;

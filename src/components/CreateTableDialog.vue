@@ -144,6 +144,8 @@ export default {
             let form = {};
 
             form.tableName = this.table.name
+            form.engine = this.table.engine
+            form.collation = this.table.collation
             form.databaseName = this.$route.params.database
             form.columns = JSON.parse(JSON.stringify(this.columns))
             
