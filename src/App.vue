@@ -76,17 +76,27 @@ export default {
         },
 
         async SelectTheme() {
-            if (this.theme) {
-                let styles = document.querySelectorAll('style');
-                styles[styles.length - 1].remove();
+            if (this.theme && this.themes.includes(this.theme)) {
+                localStorage.setItem('theme', this.theme)
+
+                let link = document.createElement('link');
+                link.rel = "stylesheet";
+                link.href = '/themes/' + this.theme + '.css';
+                document.head.appendChild(link);
+            } else {
+                let link = document.createElement('link');
+                link.rel = "stylesheet";
+                link.href = '/themes/arya-purple.css';
+                link.setAttribute('data-theme', this.theme);
+                document.head.appendChild(link);
+
+                localStorage.removeItem('theme')
             }
 
-            if (this.theme && this.themes.includes(this.theme)) {
-                let test = await import('@/assets/themes/' + this.theme + '.css')
-                localStorage.setItem('theme', this.theme)
-            } else {
-                await import('@/assets/themes/arya-purple.css')
-                localStorage.removeItem('theme')
+            let oldThemes = document.querySelectorAll('[data-theme]');
+
+            for (let i = 0; i < oldThemes.length - 1; i++) {
+                oldThemes[i].remove();
             }
         }
     },
