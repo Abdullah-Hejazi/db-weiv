@@ -3,15 +3,16 @@ export default {
     name: 'TableData',
 
     methods: {
-        EditCell(e, r) {
-            console.log(e, r)
+        EditColumn(e) {
+            console.log(e)
         }
     },
 
     props : [
-        'table',
         'columns',
-        'data'
+        'data',
+        'sort',
+        'error'
     ],
 
     data () {
@@ -26,6 +27,9 @@ export default {
 <template>
     <div>
         <DataTable
+            :resizableColumns="true"
+            removableSort
+            columnResizeMode="expand"
             :value="data"
             :lazy="true"
             :row-hover="true"
@@ -35,24 +39,25 @@ export default {
             :rows-per-page-options="[10,25,50]"
             current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
             responsive-layout="scroll"
-            editMode="cell" @cell-edit-complete="EditCell"
+            @sort="sort"
         >
+            <div class="text-center text-xl mb-4" v-if="error">
+                <InlineMessage severity="error" class="w-full scalein select-text">
+                    {{ error }}
+                </InlineMessage>
+            </div>
 
             <template #empty>
-                <div class="text-center text-xl">
+                <div class="text-center text-xl" v-if="! error">
                     No rows found.
                 </div>
             </template>
 
             <Column selection-mode="multiple" header-style="width: 3rem" />
 
-            <Column v-for="(col, index) of columns" :field="col.name" :header="col.name" :key="index" style="width: 100px;">
-                <template #editor="{ data, field }">
-                    <InputText v-model="data[field]" autofocus />
-                </template>
-
+            <Column :sortable="true" v-for="(col, index) of columns" :field="col.name" :header="col.name" :key="index" style="width: 100px;">
                 <template #body="slotProps">
-                    <div class="row-data">
+                    <div class="row-data" v-on:dblclick="EditColumn(slotProps)">
                         {{ slotProps.data[slotProps.field] }}
                     </div>
                 </template>
@@ -67,11 +72,6 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.table-data {
-    width: 100%;
-    overflow: hidden;
 }
 
 .p-datatable-responsive-scroll > .p-datatable-wrapper{

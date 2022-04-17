@@ -34,7 +34,9 @@ export default {
             },
 
             data: [],
-            columns: []
+            columns: [],
+            sort: null,
+            error: ''
         }
     },
 
@@ -43,21 +45,44 @@ export default {
     ],
 
     methods : {
-        PageChange(event) {
+        PageChange() {
+            this.LoadTable()
+        },
+
+        SortChange(e) {
+            if (e.sortOrder === 1) {
+                this.sort = {
+                    field: e.sortField,
+                    order: 'ASC'
+                }
+            } else if (e.sortOrder === -1) {
+                this.sort = {
+                    field: e.sortField,
+                    order: 'DESC'
+                }
+            } else {
+                this.sort = null
+            }
+
             this.LoadTable()
         },
 
         async LoadTable () {
-            this.$store.dispatch('database/loadTable', {
+            let form = {
                 database: this.$route.params.database,
                 table: this.table,
                 page: this.pagination.page,
-                perPage: this.pagination.perPage
-            }).then(result => {
+                perPage: this.pagination.perPage,
+                sort: this.sort
+            }
+
+            this.$store.dispatch('database/loadTable', form).then(result => {
                 if (result.success) {
                     this.data = result.data[0][0]
                     this.columns = result.data[1][0]
                     this.pagination.total = result.data[0][1][0].count
+                } else {
+                    this.error = result.error
                 }
             })
         }
@@ -90,7 +115,7 @@ export default {
             </template>
 
             <ScrollPanel class="w-full scroll-menu2">
-                <TableData :data="data" :columns="columns" v-if="activeIndex == 0" />
+                <TableData :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0" />
                 <TableStructure v-if="activeIndex == 1" />
             </ScrollPanel>
 
@@ -100,7 +125,7 @@ export default {
                 :totalRecords="pagination.total"
                 :rowsPerPageOptions="[10, 25, 50, 100]"
                 v-model:rows="pagination.perPage"
-                @page="PageChange($event)"
+                @page="PageChange"
             />
         </Panel>
     </div>

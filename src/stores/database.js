@@ -333,12 +333,20 @@ const database = {
             try {
                 let connection = await dbservice.getConnection();
 
-                let query = 'SELECT * FROM ??.?? LIMIT ? OFFSET ?';
-                query += '; SELECT COUNT(*) as count FROM ??.??'
+                let baseQuery = 'FROM ??.?? ';
+                let data = [form.database, form.table];
+
+                if (form.sort) {
+                    baseQuery += 'ORDER BY ?? ' + form.sort.order + ' ';
+                    data.push(form.sort.field)
+                }
+
+                let finalQuery = 'SELECT * ' + baseQuery + 'LIMIT ? OFFSET ?;';
+                finalQuery += 'SELECT COUNT(*) as count ' + baseQuery;
 
                 result = await connection.query(
-                    query,
-                    [form.database, form.table, form.perPage, form.page, form.database, form.table]
+                    finalQuery,
+                    [...data, form.perPage, form.page, ...data]
                 )
 
             } catch (e) {
