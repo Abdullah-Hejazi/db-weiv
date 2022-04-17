@@ -48,7 +48,7 @@ export default {
             </div>
 
             <template #empty>
-                <div class="text-center text-xl" v-if="! error">
+                <div class="text-xl" v-if="! error">
                     No rows found.
                 </div>
             </template>

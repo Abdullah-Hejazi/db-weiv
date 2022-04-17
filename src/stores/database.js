@@ -341,12 +341,41 @@ const database = {
                     data.push(form.sort.field)
                 }
 
-                let finalQuery = 'SELECT * ' + baseQuery + 'LIMIT ? OFFSET ?;';
+                if (form.search?.value && form.search?.field?.name) {
+                    baseQuery += 'WHERE ?? LIKE ? ';
+                    data.push(form.search.field.name)
+                    data.push('%' + form.search.value + '%')
+                }
+
+                let finalQuery = 'SELECT * ' + baseQuery + ' LIMIT ? OFFSET ?;';
                 finalQuery += 'SELECT COUNT(*) as count ' + baseQuery;
 
                 result = await connection.query(
                     finalQuery,
                     [...data, form.perPage, form.page, ...data]
+                )
+
+            } catch (e) {
+                error = e
+            }
+
+            return {
+                success: !error,
+                error: error?.message,
+                data: result
+            }
+        },
+
+        async dropTable(context, form) {
+            let error = null
+            let result = []
+
+            try {
+                let connection = await dbservice.getConnection();
+
+                result = await connection.query(
+                    'DROP TABLE IF EXISTS ??.??',
+                    [form.database, form.table]
                 )
 
             } catch (e) {

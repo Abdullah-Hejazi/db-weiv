@@ -79,6 +79,12 @@ export default {
             }
 
             this.table = name
+        },
+
+        DeleteTable() {
+            this.table = ''
+            this.items.splice(1, 1);
+            this.RefreshTables()
         }
     },
 
@@ -145,6 +151,7 @@ export default {
         <div class="p-0 md:flex justify-content-start">
             <div class="col-12 md:col-4 lg:col-3 xl:col-2 mt-3 p-0">
                 <TablesList
+                    class=""
                     :database="database"
                     :data="data"
                     :engines="engines"
@@ -154,7 +161,7 @@ export default {
             </div>
 
             <div class="col-12 md:col-8 lg:col-9 xl:col-10 mt-3 p-0 sm:pl-3" v-if="table">
-                <TableView :table="table" />
+                <TableView :table="table" :delete="DeleteTable" />
             </div>
         </div>
     </div>
@@ -162,11 +169,11 @@ export default {
 
 <style>
 .scroll-menu {
-    height: calc(100vh - 300px);
+    height: calc(100vh - 280px);
 }
 
 .scroll-menu2 {
-    height: calc(100vh - 378px);
+    height: calc(100vh - 358px);
 }
 
 </style>

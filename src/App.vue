@@ -122,7 +122,7 @@ export default {
         </div>
     </header>
 
-    <div class="select-none">
+    <div>
         <RouterView />
     </div>
 </template>

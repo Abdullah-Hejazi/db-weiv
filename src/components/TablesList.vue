@@ -114,7 +114,7 @@ export default {
                 </Menu>
             </ScrollPanel>
 
-            <div v-if="data.length == 0" class="text-center">
+            <div v-if="data.length == 0" class="text-center py-5">
                 <span class="pi pi-exclamation-circle"></span>
                 No tables or views found.
             </div>
