@@ -36,7 +36,8 @@ export default {
             data: [],
             columns: [],
             sort: null,
-            error: ''
+            error: '',
+            loading: false
         }
     },
 
@@ -68,6 +69,11 @@ export default {
         },
 
         async LoadTable () {
+            this.loading = true
+
+            this.data = []
+            this.columns = []
+
             let form = {
                 database: this.$route.params.database,
                 table: this.table,
@@ -84,6 +90,8 @@ export default {
                 } else {
                     this.error = result.error
                 }
+            }).finally(() => {
+                this.loading = false
             })
         }
     },
@@ -94,6 +102,7 @@ export default {
 
     watch : {
         table: function () {
+            this.pagination.total = 0
             this.pagination.page = 0
             this.LoadTable()
         }
@@ -114,19 +123,26 @@ export default {
                 </Button>
             </template>
 
-            <ScrollPanel class="w-full scroll-menu2">
-                <TableData :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0" />
-                <TableStructure v-if="activeIndex == 1" />
-            </ScrollPanel>
+            <BlockUI :blocked="loading">
+                <ScrollPanel class="w-full scroll-menu2">
+                    <TableData :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
+                    <TableStructure v-if="activeIndex == 1" />
 
-            <Paginator
-                v-model:first="pagination.page"
-                :rows="pagination.perPage"
-                :totalRecords="pagination.total"
-                :rowsPerPageOptions="[10, 25, 50, 100]"
-                v-model:rows="pagination.perPage"
-                @page="PageChange"
-            />
+                    <div class="text-center mt-5" v-if="loading">
+                        <ProgressSpinner />
+                    </div>
+                </ScrollPanel>
+
+                <Paginator
+                    v-model:first="pagination.page"
+                    :rows="pagination.perPage"
+                    :totalRecords="pagination.total"
+                    :rowsPerPageOptions="[10, 25, 50, 100]"
+                    v-model:rows="pagination.perPage"
+                    @page="PageChange"
+                    :pageLinkSize="3"
+                />
+            </BlockUI>
         </Panel>
     </div>
 </template>
