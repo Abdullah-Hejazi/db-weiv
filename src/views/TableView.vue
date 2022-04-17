@@ -1,114 +1,107 @@
 <script>
+
+import TableData from '@/components/TableData.vue'
+import TableStructure from '@/components/TableStructure.vue'
+
 export default {
     name: 'TableView',
 
-    methods: {
-        async LoadData () {
-            this.loading = true
-            this.$store.dispatch('database/loadTable', {
-                database: this.$route.params.database,
-                table: this.$route.params.table,
-                page: this.page,
-                perPage: this.perPage
-            }).then(result => {
-                if (result.success) {
-                    this.data = result.data[0]
-                    this.columns = result.data[1]
-                }
-            }).finally(() => {
-                this.loading = false
-            });
-        },
+    components: {
+        TableData,
+        TableStructure
+    },
 
-        EditCell(e, r) {
-            console.log(e, r)
+    data() {
+        return {
+            items: [
+                {
+                    label: 'Table',
+                    icon: 'pi pi-table',
+                    command: () => this.activeIndex = 0
+                },
+                {
+                    label: 'Structure',
+                    icon: 'pi pi-database',
+                    command: () => this.activeIndex = 1
+                }
+            ],
+
+            activeIndex: 0,
+            pagination: {
+                page: 0,
+                perPage: 25,
+                total: 0
+            },
+
+            data: [],
+            columns: []
         }
     },
 
-    data () {
-        return {
-            columns: [],
-            data: [],
-            perPage: 25,
-            page: 1,
-            maxPage: 3,
-            selectedRows: [],
-            loading: false
+    props: [
+        'table',
+    ],
+
+    methods : {
+        PageChange(event) {
+            this.LoadTable()
+        },
+
+        async LoadTable () {
+            this.$store.dispatch('database/loadTable', {
+                database: this.$route.params.database,
+                table: this.table,
+                page: this.pagination.page,
+                perPage: this.pagination.perPage
+            }).then(result => {
+                if (result.success) {
+                    this.data = result.data[0][0]
+                    this.columns = result.data[1][0]
+                    this.pagination.total = result.data[0][1][0].count
+                }
+            })
         }
     },
 
     mounted () {
-        this.LoadData()
+        this.LoadTable()
     },
 
     watch : {
-        '$route.params.table' : function() {
-            this.LoadData()
+        table: function () {
+            this.pagination.page = 0
+            this.LoadTable()
         }
-    }
+    },
 }
-
 </script>
 
 <template>
     <div>
-        <div>
-            <DataTable
-                :value="data"
-                :paginator="true"
-                :rows="perPage"
-                :alwaysShowPaginator="true"
-                :lazy="true"
-                :row-hover="true"
-                v-model:selection="selectedRows"
-                :showGridlines="true"
-                :loading="loading"
-                paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rows-per-page-options="[10,25,50]"
-                current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
-                responsive-layout="scroll"
-                editMode="cell" @cell-edit-complete="EditCell"
-            >
+        <Panel>
+            <template #header>
+                <TabMenu :model="items" :activeIndex="activeIndex" />
+            </template>
 
-                <template #empty>
-                    <div class="text-center text-xl">
-                        No rows found.
-                    </div>
-                </template>
+            <template #icons>
+                <Button class="p-panel-header-icon p-link mr-2">
+                    <span class="pi pi-cog"></span>
+                </Button>
+            </template>
 
-                <Column selection-mode="multiple" header-style="width: 3rem" />
+            <ScrollPanel class="w-full scroll-menu2">
+                <TableData :data="data" :columns="columns" v-if="activeIndex == 0" />
+                <TableStructure v-if="activeIndex == 1" />
+            </ScrollPanel>
 
-                <Column v-for="(col, index) of columns" :field="col.name" :header="col.name" :key="index" style="width: 100px;">
-                    <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" autofocus />
-                    </template>
-
-                    <template #body="slotProps">
-                        <div class="row-data">
-                            {{ slotProps.data[slotProps.field] }}
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
-        </div>
+            <Paginator
+                v-model:first="pagination.page"
+                :rows="pagination.perPage"
+                :totalRecords="pagination.total"
+                :rowsPerPageOptions="[10, 25, 50, 100]"
+                v-model:rows="pagination.perPage"
+                @page="PageChange($event)"
+            />
+        </Panel>
     </div>
 </template>
-
-<style>
-.row-data {
-    max-width: 250px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.table-data {
-    width: 100%;
-    overflow: hidden;
-}
-
-.p-datatable-responsive-scroll > .p-datatable-wrapper{
-    overflow-x: unset !important;
-}
-
-</style>

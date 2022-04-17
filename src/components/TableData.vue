@@ -1,73 +1,81 @@
-<script>import M from "minimatch"
-
-
+<script>
 export default {
     name: 'TableData',
 
-    data() {
-        return {
-            items: [
-                {
-                    label: 'Table',
-                    icon: 'pi pi-table',
-                    command: this.LoadTable
-                },
-                {
-                    label: 'Structure',
-                    icon: 'pi pi-database',
-                    command: this.LoadStructure
-                }
-            ],
-
-            activeIndex: 0
+    methods: {
+        EditCell(e, r) {
+            console.log(e, r)
         }
     },
 
-    props: [
+    props : [
         'table',
+        'columns',
+        'data'
     ],
 
-    mounted () {
-        this.LoadTable()
-    },
-
-    methods : {
-        LoadTable() {
-            this.activeIndex = 0
-            this.$router.push('/databases/' + this.$route.params.database + '/' + this.table)
-        },
-
-        LoadStructure() {
-            this.activeIndex = 1
-            this.$router.push('/databases/' + this.$route.params.database + '/' + this.table + '/structure')
-        }
-    },
-
-    // watch table change
-    watch: {
-        table: function() {
-            this.LoadTable()
+    data () {
+        return {
+            selectedRows: []
         }
     }
 }
+
 </script>
 
 <template>
     <div>
-        <Panel>
-            <template #header>
-                <TabMenu :model="items" :activeIndex="activeIndex" />
+        <DataTable
+            :value="data"
+            :lazy="true"
+            :row-hover="true"
+            v-model:selection="selectedRows"
+            :showGridlines="true"
+            paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            :rows-per-page-options="[10,25,50]"
+            current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
+            responsive-layout="scroll"
+            editMode="cell" @cell-edit-complete="EditCell"
+        >
+
+            <template #empty>
+                <div class="text-center text-xl">
+                    No rows found.
+                </div>
             </template>
 
-            <template #icons>
-                <Button class="p-panel-header-icon p-link mr-2">
-                    <span class="pi pi-cog"></span>
-                </Button>
-            </template>
+            <Column selection-mode="multiple" header-style="width: 3rem" />
 
-            <ScrollPanel class="w-full scroll-menu2">
-                <router-view />
-            </ScrollPanel>
-        </Panel>
+            <Column v-for="(col, index) of columns" :field="col.name" :header="col.name" :key="index" style="width: 100px;">
+                <template #editor="{ data, field }">
+                    <InputText v-model="data[field]" autofocus />
+                </template>
+
+                <template #body="slotProps">
+                    <div class="row-data">
+                        {{ slotProps.data[slotProps.field] }}
+                    </div>
+                </template>
+            </Column>
+        </DataTable>
     </div>
 </template>
+
+<style>
+.row-data {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-data {
+    width: 100%;
+    overflow: hidden;
+}
+
+.p-datatable-responsive-scroll > .p-datatable-wrapper{
+    overflow-x: unset !important;
+}
+
+</style>

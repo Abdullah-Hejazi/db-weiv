@@ -333,12 +333,12 @@ const database = {
             try {
                 let connection = await dbservice.getConnection();
 
-                let perPage = form.perPage ? form.perPage : 25
-                let offset = form.page ? (form.page - 1) * perPage : 0
+                let query = 'SELECT * FROM ??.?? LIMIT ? OFFSET ?';
+                query += '; SELECT COUNT(*) as count FROM ??.??'
 
                 result = await connection.query(
-                    'SELECT * FROM ??.?? LIMIT ? OFFSET ?',
-                    [form.database, form.table, perPage, offset]
+                    query,
+                    [form.database, form.table, form.perPage, form.page, form.database, form.table]
                 )
 
             } catch (e) {

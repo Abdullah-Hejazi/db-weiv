@@ -1,14 +1,14 @@
 <script>
 
 import TablesList from '@/components/TablesList'
-import TableData from '@/components/TableData'
+import TableView from '@/views/TableView'
 
 export default {
     name: 'DatabaseView',
 
     components: {
         TablesList,
-        TableData
+        TableView
     },
 
     data() {
@@ -154,7 +154,7 @@ export default {
             </div>
 
             <div class="col-12 md:col-8 lg:col-9 xl:col-10 mt-3 p-0 sm:pl-3" v-if="table">
-                <TableData :table="table" />
+                <TableView :table="table" />
             </div>
         </div>
     </div>
@@ -166,7 +166,7 @@ export default {
 }
 
 .scroll-menu2 {
-    height: calc(100vh - 320px);
+    height: calc(100vh - 378px);
 }
 
 </style>

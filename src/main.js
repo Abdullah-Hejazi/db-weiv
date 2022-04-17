@@ -34,6 +34,8 @@ import ScrollPanel from 'primevue/scrollpanel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import TabMenu from 'primevue/tabmenu';
+import Paginator from 'primevue/paginator';
+import ScrollTop from 'primevue/scrolltop';
 
 
 import App from "./App.vue";
@@ -73,6 +75,8 @@ app.component('ScrollPanel', ScrollPanel);
 app.component('DataTable', DataTable);
 app.component('Column', Column);
 app.component('TabMenu', TabMenu);
+app.component('Paginator', Paginator);
+app.component('ScrollTop', ScrollTop);
 
 
 app.directive('Tooltip', Tooltip);

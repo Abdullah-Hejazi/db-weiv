@@ -1,11 +1,11 @@
 <script>
 export default {
-    name: 'StructureView'
+    name: 'TableStructure'
 }
 </script>
 
 <template>
     <div>
-        {{ $route.params.table }} Structure
+        Structure
     </div>
 </template>
