@@ -73,7 +73,7 @@ export default {
 
     props: [
         'table',
-        'delete'
+        'deleteTable'
     ],
 
     methods : {
@@ -137,6 +137,8 @@ export default {
             }
 
             this.search.searching = true
+            this.pagination.page = 0
+            this.sort = null
             this.LoadTable()
             this.search.active = false
         },
@@ -149,6 +151,10 @@ export default {
 
         OpenTableMenu(event) {
             this.$refs.tableMenu.toggle(event)
+        },
+
+        DropTableEnd() {
+            this.deleteTable()
         },
 
         async DropTable() {
@@ -165,12 +171,12 @@ export default {
                         detail:'Table has been deleted successfully',
                         life: 3000
                     });
-
-                    this.delete()
                 } else {
                     this.error = result.error
                 }
+
             }).finally(() => {
+                this.DropTableEnd()
                 this.loading = false
             })
         },
@@ -198,6 +204,18 @@ export default {
             }
 
             return options
+        },
+
+        sortOrder() {
+            if (this.sort) {
+                if (this.sort.order === 'ASC') {
+                    return 1
+                } else if (this.sort.order === 'DESC') {
+                    return -1
+                }
+            }
+
+            return 0
         }
     },
 
@@ -208,6 +226,7 @@ export default {
             this.search.value = ''
             this.search.field = null
             this.search.searching = false
+            this.sort = null
             this.LoadTable()
         }
     },
@@ -235,7 +254,7 @@ export default {
 
             <BlockUI :blocked="loading">
                 <ScrollPanel class="w-full scroll-menu2">
-                    <TableData :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
+                    <TableData :sortOrder="sortOrder" :sortField="sort?.field" :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
                     <TableStructure v-if="activeIndex == 1" />
 
                     <div class="text-center mt-5" v-if="loading">

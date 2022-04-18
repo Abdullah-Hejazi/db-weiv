@@ -1,5 +1,6 @@
 // import mysql from 'mysql2/promise'
 import dbservice from '@/services/dbservice'
+import QueryBuilder from '@/services/querybuilder'
 
 const database = {
     namespaced: true,
@@ -43,348 +44,210 @@ const database = {
                 multipleStatements: true
             }
 
-            let error = null
-
             try {
-                await dbservice.createConnection(data)
+                await dbservice.createConnection(data);
 
-                let connection = await dbservice.getConnection();
-                await connection.query('SELECT 1;')
+                let query = QueryBuilder.select('1').build();
+
+                await dbservice.query(query);
 
                 context.commit('setData', data)
                 context.commit('setConnected', true)
 
             } catch (e) {
-                error = e
+                return {
+                    sucess: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message
+                success: true
             }
         },
 
-        async refreshDatabases(context, form) {
-            let error = null
-
+        async refreshDatabases(context) {
             try {
-                let connection = await dbservice.getConnection();
+                let query1 = QueryBuilder.select('*').from('information_schema', 'SCHEMATA').build();
+                let query2 = QueryBuilder.select('*').from('information_schema', 'COLLATIONS').build();
 
-                let [result] = await connection.query('SELECT * FROM information_schema.SCHEMATA; SELECT * FROM information_schema.COLLATIONS;')
+                let [result] = await dbservice.query(query1, query2);
 
                 context.commit('setDatabases', result[0])
                 context.commit('setCollations', result[1])
 
             } catch (e) {
-                error = e
+                return {
+                    sucess: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message
+                sucess: true
             }
         },
 
         async createDatabase(context, form) {
-            let error = null
-
             try {
-                let connection = await dbservice.getConnection();
+                let query = QueryBuilder.createDatabase(
+                    form.name,
+                    form.collation.CHARACTER_SET_NAME,
+                    form.collation.COLLATION_NAME
+                );
 
-                await connection.query(
-                    'CREATE DATABASE ?? CHARACTER SET ? COLLATE ?;',
-                    [form.name, form.collation.CHARACTER_SET_NAME, form.collation.COLLATION_NAME]
-                )
-
-                let result = await context.dispatch('refreshDatabases')
-
-                if (!result.success) {
-                    return {
-                        success: false,
-                        error: result.error
-                    }
-                }
+                await dbservice.query(query)
 
             } catch (e) {
-                error = e
+                return {
+                    sucess: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message
+                success: true
             }
         },
 
         async dropDatabase(context, schema) {
-            let error = null
-
             try {
-                let connection = await dbservice.getConnection();
+                let query = QueryBuilder.dropDatabase(schema);
 
-                await connection.query(
-                    'DROP DATABASE ??;',
-                    [schema]
-                )
-
-                let result = await context.dispatch('refreshDatabases')
-
-                if (!result.success) {
-                    return {
-                        success: false,
-                        error: result.error
-                    }
-                }
+                await dbservice.query(query);
 
             } catch (e) {
-                error = e
+                return {
+                    sucess: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message
+                success: true
             }
         },
 
         async getDatabase(context, schema) {
-            let error = null
             let result = []
             let name = ''
             let engines = []
 
             try {
-                let connection = await dbservice.getConnection();
+                let query = QueryBuilder.show('FULL TABLES').from(schema).build();
+                let query2 = QueryBuilder.show('ENGINES').build();
 
-                result = await connection.query(
-                    'USE ??; SHOW FULL TABLES; SHOW ENGINES;',
-                    [schema]
-                )
+                result = await dbservice.query(query, query2);
 
-                name = result[1][1][0].name
-                engines = result[0][2]
-                result = result[0][1]
+                name = result[1][0][0].name
+                engines = result[0][1]
+                result = result[0][0]
 
             } catch (e) {
-                error = e
+                return {
+                    sucess: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message,
+                success: true,
                 data: result,
                 name: name,
                 engines: engines
             }
         },
 
-        // this thing needs refactoring lol
         async createTable(context, form) {
-            let result = []
-            let error = null
-            let unique = []
-            let indexes = []
-            let fulltexts = []
-
-            let data = []
-
-            function getDefaultSize(type) {
-                if (type == 'VARCHAR') {
-                    return 255
-                } else if (type == 'CHAR') {
-                    return 1
-                } else if (type == 'BINARY') {
-                    return 255
-                } else if (type == 'VARBINARY') {
-                    return 255
-                } else if (type == 'FLOAT') {
-                    return 24
-                } else if (type == 'BIT') {
-                    return 8
-                } else if (type == 'NUMERIC' || type == 'DECIMAL') {
-                    return 8
-                }
-
-                return 16
-            }
-
             try {
-                let query = 'USE ??; CREATE TABLE ?? (';
-                data.push(form.databaseName)
-                data.push(form.tableName)
+                let query = QueryBuilder.createTable(form.databaseName, form.tableName);
 
-                for (let i = 0; i < form.columns.length; i++) {
-                    if (form.columns[i].index == 'UNIQUE') {
-                        unique.push(form.columns[i])
+                form.columns.forEach(column => {
+                    query.addColumn(column);
+
+                    if (column.index == 'UNIQUE') {
+                        query.addUnique(column.name);
+                    } else if (column.index && column.index !== 'PRIMARY KEY') {
+                        query.addIndex(column.index, column.name);
                     }
+                })
 
-                    if (form.columns[i].index == 'INDEX') {
-                        indexes.push(form.columns[i].name)
-                    }
-
-                    if (form.columns[i].index == 'FULLTEXT') {
-                        fulltexts.push(form.columns[i].name)
-                    }
-
-                    query += '?? ' + form.columns[i].type.label + ' ';
-
-                    if (form.columns[i].type.values) {
-                        let values = form.columns[i].values.split(',')
-                        // remove starting space and ending space in values
-                        for (let j = 0; j < values.length; j++) {
-                            values[j] = '\'' + values[j].trim() + '\''
-                        }
-                        
-                        // add values to query between single qoutation mark
-                        query += '(' + values.join(',') + ') ';
-
-                        // query += '(' + form.columns[i].values + ') ';
-                    }
-
-                    data.push(form.columns[i].name)
-
-                    if (form.columns[i].type.size) {
-                        if (form.columns[i].size) {
-                            query += '(' + form.columns[i].size;
-                        } else {
-                            query += '(' + getDefaultSize(form.columns[i].type.label);
-                        }
-
-                        if (form.columns[i].type.precision) {
-                            if (form.columns[i].precision) {
-                                query += ',' + (form.columns[i].precision) + ') ';
-                            } else {
-                                query += ',' + 4 + ') ';
-                            }
-                        } else {
-                            query += ') ';
-                        }
-                    }
-
-                    query += (form.columns[i].isNull ? '' : 'NOT NULL') + ' ' + (form.columns[i].autoIncrement ? 'AUTO_INCREMENT' : '') + ' ';
-
-                    // query += ((form.columns[i].defaultValue && form.columns[i].defaultValue != 'None' && form.columns[i].defaultValue != 'NULL') ? 'DEFAULT \'' + form.columns[i].defaultValue + '\'' : '') + ' ';
-                    
-                    if (form.columns[i].defaultValue == 'CURRENT_TIMESTAMP') {
-                        query += 'DEFAULT ' + form.columns[i].defaultValue + ' ';
-                    } else if (form.columns[i].defaultValue != 'None' && form.columns[i].defaultValue != 'NULL') {
-                        query += 'DEFAULT \'' + form.columns[i].defaultValue + '\'' + ' ';
-                    }
-
-                    query +=  (form.columns[i].index == 'PRIMARY KEY' ? 'PRIMARY KEY' : '') + ' ' + (i < form.columns.length - 1 ? ', ' : '');
-                }
-
-                for (let i = 0; i < unique.length; i++) {
-                    query += ', CONSTRAINT ';
-
-                    query += 'UNIQUE_' + unique[i].name + ' ';
-
-                    query += 'UNIQUE (??) ';
-                    data.push(unique[i].name)
-                }
-
-                if (indexes.length > 0 ) {
-                    query += ', INDEX (';
-                }
-
-                for (let i = 0; i < indexes.length; i++) {
-                    query += '?? ' + (i < indexes.length - 1 ? ', ' : ')');
-                    data.push(indexes[i])
-                }
-                
-                if (fulltexts.length > 0 ) {
-                    query += ', FULLTEXT (';
-                }
-
-                for (let i = 0; i < fulltexts.length; i++) {
-                    query += '?? ' + (i < fulltexts.length - 1 ? ', ' : ')');
-                    data.push(fulltexts[i])
-                }
-
-                query += ') ';
 
                 if (form.engine) {
-                    query += 'ENGINE = ' + form.engine.Engine + ' ';
+                    query.engine(form.engine.Engine);
                 }
 
                 if (form.collation) {
-                    query += 'CHARACTER SET ' + form.collation.CHARACTER_SET_NAME + ' COLLATE ' + form.collation.COLLATION_NAME + ' ';
+                    query.collation(form.collation);
                 }
 
-                let connection = await dbservice.getConnection();
-
-                result = await connection.query(
-                    query,
-                    data
-                )
+                await dbservice.query(query.build())
 
             } catch (e) {
-                error = e
+                return {
+                    success: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message
+                success: true
             }
         },
 
         async loadTable(context, form) {
-            let error = null
             let result = []
 
             try {
-                let connection = await dbservice.getConnection();
+                let query = QueryBuilder.select('*');
+                query.from(form.database, form.table);
 
-                let baseQuery = 'FROM ??.?? ';
-                let data = [form.database, form.table];
-
-                if (form.sort) {
-                    baseQuery += 'ORDER BY ?? ' + form.sort.order + ' ';
-                    data.push(form.sort.field)
-                }
+                let countQuery = QueryBuilder.select('COUNT(*) as count');
+                countQuery.from(form.database, form.table);
 
                 if (form.search?.value && form.search?.field?.name) {
-                    baseQuery += 'WHERE ?? LIKE ? ';
-                    data.push(form.search.field.name)
-                    data.push('%' + form.search.value + '%')
+                    query.where(form.search.field.name, 'LIKE', '%' + form.search.value + '%');
+                    countQuery.where(form.search.field.name, 'LIKE', '%' + form.search.value + '%');
                 }
 
-                let finalQuery = 'SELECT * ' + baseQuery + ' LIMIT ? OFFSET ?;';
-                finalQuery += 'SELECT COUNT(*) as count ' + baseQuery;
+                if (form.sort) {
+                    query.orderBy(form.sort.field, form.sort.order);
+                    countQuery.orderBy(form.sort.field, form.sort.order);
+                }
+                
+                query.limit(form.perPage).offset(form.page);
 
-                result = await connection.query(
-                    finalQuery,
-                    [...data, form.perPage, form.page, ...data]
-                )
+                result = await dbservice.query(query.build(), countQuery.build())
 
             } catch (e) {
-                error = e
+                return {
+                    success: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message,
+                success: true,
                 data: result
             }
         },
 
         async dropTable(context, form) {
-            let error = null
             let result = []
 
             try {
-                let connection = await dbservice.getConnection();
+                let query = QueryBuilder.dropTable(form.database, form.table);
 
-                result = await connection.query(
-                    'DROP TABLE IF EXISTS ??.??',
-                    [form.database, form.table]
-                )
-
+                result = await dbservice.query(query)
             } catch (e) {
-                error = e
+                return {
+                    success: false,
+                    error: e.message
+                }
             }
 
             return {
-                success: !error,
-                error: error?.message,
+                success: false,
                 data: result
             }
         },

@@ -1,11 +1,20 @@
 <script>
+import QueryBuilder from '@/services/querybuilder';
+
 export default {
-    name: 'TableStructure'
+    name: 'TableStructure',
+
+    methods: {
+        Test() {
+            let query = new QueryBuilder('dbweiv', 'users');
+            query.select('*')
+        }
+    }
 }
 </script>
 
 <template>
     <div>
-        Structure
+        <Button label="Hello" @click="Test" />
     </div>
 </template>

@@ -183,7 +183,9 @@ export default {
                 return val
             }
 
-            return type?.label
+            if (! type ) return '';
+
+            return type.label
         },
 
         MoreOptions() {

@@ -161,7 +161,7 @@ export default {
             </div>
 
             <div class="col-12 md:col-8 lg:col-9 xl:col-10 mt-3 p-0 sm:pl-3" v-if="table">
-                <TableView :table="table" :delete="DeleteTable" />
+                <TableView :table="table" :deleteTable="DeleteTable" />
             </div>
         </div>
     </div>

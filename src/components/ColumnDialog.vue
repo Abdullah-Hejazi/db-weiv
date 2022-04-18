@@ -16,9 +16,6 @@ export default {
 
             defaultTypes: [
                 {
-                    label: 'None'
-                },
-                {
                     label: 'As Defined'
                 },
                 {
@@ -185,10 +182,6 @@ export default {
 
             indexTypes: [
                 {
-                    label: 'None',
-                    none: true
-                },
-                {
                     label: 'PRIMARY KEY'
                 },
                 {
@@ -220,7 +213,6 @@ export default {
     ],
 
     mounted() {
-        this.defaultType = this.defaultTypes[0]
         this.type = this.types[0].items[0]
 
         if (this.column) {
@@ -249,7 +241,7 @@ export default {
                 this.isNull = false
 
                 if (this.index?.label !== 'UNIQUE') {
-                    this.index = this.indexTypes[1]
+                    this.index = this.indexTypes[0]
                 }
             }
         },

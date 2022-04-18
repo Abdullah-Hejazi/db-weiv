@@ -46,6 +46,10 @@ export default {
                         detail:'Database has been created successfully',
                         life: 3000
                     });
+
+                    this.createDatabaseDialog = false;
+
+                    this.RefreshDatabase()
                 } else {
                     this.newDBError = result.error;
                 }
@@ -73,6 +77,8 @@ export default {
                         detail:'Database has been dropped successfully',
                         life: 3000
                     });
+
+                    this.RefreshDatabase()
                 } else {
                     this.error = result.error;
                 }

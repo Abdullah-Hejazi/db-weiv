@@ -4,7 +4,7 @@ export default {
 
     methods: {
         EditColumn(e) {
-            console.log(e)
+            this.sort(e)
         }
     },
 
@@ -12,7 +12,9 @@ export default {
         'columns',
         'data',
         'sort',
-        'error'
+        'error',
+        'sortField',
+        'sortOrder'
     ],
 
     data () {
@@ -29,6 +31,8 @@ export default {
         <DataTable
             :resizableColumns="true"
             removableSort
+            :sortField="sortField"
+            :sortOrder="sortOrder"
             columnResizeMode="expand"
             :value="data"
             :lazy="true"
@@ -39,7 +43,7 @@ export default {
             :rows-per-page-options="[10,25,50]"
             current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
             responsive-layout="scroll"
-            @sort="sort"
+            @sort="EditColumn"
         >
             <div class="text-center text-xl mb-4" v-if="error">
                 <InlineMessage severity="error" class="w-full scalein select-text">
