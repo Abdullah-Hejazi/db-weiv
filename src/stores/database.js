@@ -207,21 +207,17 @@ const database = {
                 let query = QueryBuilder.select('*');
                 query.from(form.database, form.table);
 
-                let countQuery = QueryBuilder.select('COUNT(*) as count');
-                countQuery.from(form.database, form.table);
-
                 if (form.search?.value && form.search?.field?.name) {
-                    let searchValue = form.search.operator == 'LIKE' ? `%${form.search.value}%` : form.search.value;
-
-                    query.where(form.search.field.name, form.search.operator, searchValue);
-                    countQuery.where(form.search.field.name, form.search.operator, searchValue);
+                    query.where(form.search.field.name, form.search.operator, form.search.value);
                 }
 
                 if (form.sort) {
                     query.orderBy(form.sort.field, form.sort.order);
-                    countQuery.orderBy(form.sort.field, form.sort.order);
                 }
-                
+
+                let countQuery = query.clone();
+                countQuery.fields = ['COUNT(*) as count']
+    
                 query.limit(form.perPage).offset(form.page);
 
                 result = await dbservice.query(query.build(), countQuery.build())

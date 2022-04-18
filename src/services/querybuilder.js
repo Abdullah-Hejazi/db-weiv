@@ -34,13 +34,14 @@ class QueryBuilder {
         queryBuilder.type = this.type;
         queryBuilder.database = this.database;
         queryBuilder.table = this.table;
-        queryBuilder.fields = this.fields;
-        queryBuilder.additions = this.additions;
-        queryBuilder.columns = this.columns;
-        queryBuilder.wheres = this.wheres;
-        queryBuilder.indexes = this.indexes;
-        queryBuilder.uniques = this.uniques;
-        queryBuilder.parameters = this.parameters;
+
+        queryBuilder.fields = this.#cloneArray(this.fields);
+        queryBuilder.additions = this.#cloneArray(this.additions);
+        queryBuilder.columns = this.#cloneArray(this.columns);
+        queryBuilder.wheres = this.#cloneArray(this.wheres);
+        queryBuilder.indexes = this.#cloneArray(this.indexes);
+        queryBuilder.uniques = this.#cloneArray(this.uniques);
+        queryBuilder.parameters = this.#cloneArray(this.parameters);
 
         return queryBuilder;
     }
@@ -114,6 +115,10 @@ class QueryBuilder {
 
     where(field, operator, value) {
         this.wheres.push('?? ' + operator + ' ?');
+
+        if (operator == 'LIKE') {
+            value = `%${value}%`;
+        }
 
         this.parameters.push(field, value);
 
@@ -364,6 +369,10 @@ class QueryBuilder {
             query: query,
             parameters: this.parameters
         };
+    }
+
+    #cloneArray(array) {
+        return array.map(item => item);
     }
 }
 
