@@ -63,11 +63,26 @@ export default {
                 active: false,
                 value: '',
                 field: null,
-                searching: false
+                searching: false,
+                operator: 'LIKE'
             },
+            searchOperators: [
+                'LIKE',
+                '=',
+                '!=',
+                '<',
+                '>',
+                '<=',
+                '>='
+            ],
             newRow: {
                 active: false
-            }
+            },
+            moreOptions: {
+                active: false,
+                label: 'More Options',
+                icon: 'pi pi-angle-down'
+            },
         }
     },
 
@@ -188,7 +203,19 @@ export default {
                 icon: 'pi pi-exclamation-triangle',
                 accept: this.DropTable
             });
-        }
+        },
+
+        MoreOptions() {
+            if (this.moreOptions.active) {
+                this.moreOptions.active = false
+                this.moreOptions.icon = 'pi pi-angle-down'
+                this.moreOptions.label = 'More Options'
+            } else {
+                this.moreOptions.active = true
+                this.moreOptions.icon = 'pi pi-angle-up'
+                this.moreOptions.label = 'Less Options'
+            }
+        },
     },
 
     mounted () {
@@ -293,8 +320,17 @@ export default {
                 </div>
             </div>
 
-            <div class="text-center">
+            <div class="my-3" v-if="moreOptions.active">
+                <p class="my-1">Operator</p>
+                <Dropdown v-model="search.operator" :options="searchOperators" placeholder="Operator" class="w-full" />
+            </div>
+
+            <div class="text-center mb-3">
                 <Button label="Search" class="w-full" icon="pi pi-search" @click="Search" />
+            </div>
+
+            <div class="text-center mt-2 mb-0">
+                <Button class="p-button-text p-button-plain" :icon="moreOptions.icon" :label="moreOptions.label" @click="MoreOptions" />
             </div>
         </Dialog>
     </div>

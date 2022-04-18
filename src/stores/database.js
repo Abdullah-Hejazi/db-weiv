@@ -206,8 +206,10 @@ const database = {
                 countQuery.from(form.database, form.table);
 
                 if (form.search?.value && form.search?.field?.name) {
-                    query.where(form.search.field.name, 'LIKE', '%' + form.search.value + '%');
-                    countQuery.where(form.search.field.name, 'LIKE', '%' + form.search.value + '%');
+                    let searchValue = form.search.operator == 'LIKE' ? `%${form.search.value}%` : form.search.value;
+
+                    query.where(form.search.field.name, form.search.operator, searchValue);
+                    countQuery.where(form.search.field.name, form.search.operator, searchValue);
                 }
 
                 if (form.sort) {
