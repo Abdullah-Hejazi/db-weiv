@@ -4,14 +4,6 @@ export default {
 
     data() {
         return {
-            userItems: [
-                {
-                    label: 'Logout',
-                    icon: 'pi pi-power-off',
-                    command: this.Logout
-                }
-            ],
-
             themes: [
                 "arya-blue",
                 "arya-green",
@@ -57,6 +49,7 @@ export default {
                 "vela-orange",
                 "vela-purple"
             ],
+
             theme: ''
         }
     },
@@ -67,11 +60,7 @@ export default {
             this.$router.push('/');
         },
 
-        ToggleProfileItems(event) {
-            this.$refs.menu.toggle(event)
-        },
-
-        Home() {
+        Home () {
             this.$router.push('/databases')
         },
 
@@ -109,15 +98,17 @@ export default {
     <header>
         <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
             <div class="flex align-items-center">
-                <img alt="logo" src="@/assets/logo.png" height="28" class="mr-2 cursor-pointer" @click="Home">
+                <img alt="logo" src="@/assets/logo2.png" height="34" class="cursor-pointer" @click="Home">
+                <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" label="Home" @click="Home" />
             </div>
 
             <div class="flex align-items-center">
-                <Dropdown placeholder="Theme" class="cursor-pointer theme-selector" v-model="theme" :options="themes" @change="SelectTheme" />
+                <div>
+                    <span class="pi pi-moon text-primary px-2"></span>
+                    <Dropdown placeholder="Theme" class="cursor-pointer theme-selector" v-model="theme" :options="themes" @change="SelectTheme" />
+                </div>
 
-                <Button v-if="$store.state.database.connected" iconPos="right" icon="pi pi-angle-down" class="p-button-text p-button-plain" :label="$store.state.database.data?.user" @click="ToggleProfileItems" />
-
-                <Menu id="menu" :model="userItems" ref="menu" :popup="true" />
+                <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" label="Logout" @click="Logout" />
             </div>
         </div>
     </header>
@@ -136,7 +127,7 @@ body {
 }
 
 .theme-selector {
-    width: 300px;
     max-width: 100%;
+    width: 200px;
 }
 </style>

@@ -29,6 +29,7 @@ export default {
             selectedAccount: false,
             selectedAccountIndex: 0,
             selectedAccountPassword: '',
+            savePassword: false
         }
     },
 
@@ -81,7 +82,12 @@ export default {
                 username: this.loginData.username,
                 host: this.loginData.host == '' ? 'localhost' : this.loginData.host,
                 port: this.loginData.port == null ? 3306 : this.loginData.port,
-                displayName: this.loginData.displayName
+                displayName: this.loginData.displayName,
+                savePassword: this.savePassword
+            }
+
+            if (this.savePassword) {
+                data.password = this.loginData.password
             }
 
             this.savedAccounts.push(data)
@@ -99,7 +105,10 @@ export default {
             this.selectedAccount = false
 
             let account = JSON.parse(JSON.stringify(this.savedAccounts[this.selectedAccountIndex]))
-            account.password = this.selectedAccountPassword
+            
+            if (! account.savePassword) {
+                account.password = this.selectedAccountPassword
+            }
 
             await this.PerformLogin(account)
         },
@@ -107,7 +116,12 @@ export default {
         async SelectAccount(index) {
             this.selectedAccountIndex = index
             this.selectedAccountPassword = ''
-            this.selectedAccount = true
+
+            if (this.savedAccounts[index].savePassword) {
+                await this.LoadAccount()
+            } else {
+                this.selectedAccount = true
+            }
         },
     },
 }
@@ -118,7 +132,7 @@ export default {
     <div class="login">
         <div class="loginData-card loginData-margin mx-auto surface-card p-4 shadow-2 border-round">
             <div class="text-center mb-5">
-                <img src="@/assets/logo.png" alt="DB Weiv" width="100" class="mb-3">
+                <img src="@/assets/logo2.png" alt="DB Weiv" width="50" class="mb-3">
                 <div class="text-900 text-3xl font-medium mb-3">Login</div>
             </div>
 
@@ -214,10 +228,17 @@ export default {
         </div>
 
         <Dialog header="Save account" v-model:visible="displayNameDialog" class="display-name-dialog" :modal="true">
-            <div class="p-text-secondary">
-                <small>Your password will not be saved. You'll enter it manually everytime you connect.</small>
-
+            <div>
                 <InputText placeholder="Display Name" v-model="loginData.displayName" class="w-full mt-3" />
+            </div>
+
+            <div class="mt-3">
+                <Checkbox v-model="savePassword" :binary="true" class="mr-1" />
+                Save Password Too ?
+            </div>
+
+            <div class="p-text-secondary" v-if="savePassword">
+                <p class="mb-0"><b>Note</b>: storing passwords is generally not recommended, if you choose not to, you'll be prompt to enter the password on subsequent logins !</p>
             </div>
 
             <template #footer>
@@ -266,7 +287,7 @@ export default {
 }
 
 .loginData-margin {
-    margin-top: 100px;
+    margin-top: 70px;
 }
 
 .display-name-dialog {
