@@ -259,6 +259,26 @@ const database = {
             context.commit('setData', null)
             context.commit('setConnected', false)
             await dbservice.endConnection();
+        },
+
+        async loadTableStructure(context, form) {
+            let result = []
+
+            try {
+                let query = QueryBuilder.describe(form.database, form.table)
+
+                result = await dbservice.query(query)
+            } catch (e) {
+                return {
+                    success: false,
+                    error: e.message
+                }
+            }
+
+            return {
+                success: true,
+                data: result
+            }
         }
     },
 }

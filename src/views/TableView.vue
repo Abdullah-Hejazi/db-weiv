@@ -17,12 +17,18 @@ export default {
                 {
                     label: 'Table',
                     icon: 'pi pi-table',
-                    command: () => this.activeIndex = 0
+                    command: () => {
+                        this.activeIndex = 0
+                        this.LoadTable()
+                    }
                 },
                 {
                     label: 'Structure',
                     icon: 'pi pi-database',
-                    command: () => this.activeIndex = 1
+                    command: () => {
+                        this.activeIndex = 1
+                        this.LoadTableStructure()
+                    }
                 }
             ],
 
@@ -83,6 +89,7 @@ export default {
                 label: 'More Options',
                 icon: 'pi pi-angle-down'
             },
+            tableStructure: []
         }
     },
 
@@ -216,6 +223,25 @@ export default {
                 this.moreOptions.label = 'Less Options'
             }
         },
+
+        async LoadTableStructure() {
+            this.loading = true
+
+            this.tableStructure = []
+
+            await this.$store.dispatch('database/loadTableStructure', {
+                database: this.$route.params.database,
+                table: this.table
+            }).then(result => {
+                if (result.success) {
+                    this.tableStructure = result.data[0]
+                } else {
+                    this.error = result.error
+                }
+            }).finally(() => {
+                this.loading = false
+            })
+        }
     },
 
     mounted () {
@@ -254,7 +280,13 @@ export default {
             this.search.field = null
             this.search.searching = false
             this.sort = null
-            this.LoadTable()
+            
+            if (this.activeIndex === 0) {
+                this.LoadTable()
+            } else if (this.activeIndex === 1) {
+                this.LoadTableStructure()
+            }
+
         }
     },
 }
@@ -282,7 +314,7 @@ export default {
             <BlockUI :blocked="loading">
                 <ScrollPanel class="w-full scroll-menu2">
                     <TableData :sortOrder="sortOrder" :sortField="sort?.field" :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
-                    <TableStructure v-if="activeIndex == 1" />
+                    <TableStructure :data="tableStructure" :load="LoadTableStructure" v-if="activeIndex == 1" />
 
                     <div class="text-center mt-5" v-if="loading">
                         <ProgressSpinner />
@@ -290,6 +322,7 @@ export default {
                 </ScrollPanel>
 
                 <Paginator
+                    v-if="activeIndex == 0"
                     v-model:first="pagination.page"
                     :rows="pagination.perPage"
                     :totalRecords="pagination.total"

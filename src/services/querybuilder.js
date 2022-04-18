@@ -29,6 +29,15 @@ class QueryBuilder {
         return queryBuilder;
     }
 
+    static describe(database, table) {
+        let parameters = [database, table];
+
+        return {
+            query: `DESCRIBE ??.??`,
+            parameters: parameters
+        }
+    }
+
     clone() {
         let queryBuilder = new QueryBuilder();
         queryBuilder.type = this.type;
