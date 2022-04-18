@@ -37,11 +37,16 @@ const database = {
             await context.dispatch('clearConnection')
 
             let data = {
-                host: form.host,
                 user: form.username,
                 port: form.port,
                 password: form.password,
                 multipleStatements: true
+            }
+
+            if (form.host) {
+                data.host = form.host
+            } else {
+                data.host = 'localhost'
             }
 
             try {

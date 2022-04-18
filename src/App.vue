@@ -75,7 +75,7 @@ export default {
         }
     },
 
-    created() {
+    mounted() {
         this.themes.forEach(theme => {
             let link = document.createElement('link');
             link.rel = "";
@@ -84,7 +84,7 @@ export default {
             document.head.appendChild(link);
         })
 
-        this.theme = localStorage.getItem('theme')
+        this.theme = localStorage.getItem('theme') ?? 'arya-blue';
         this.SelectTheme()
     }
 }
