@@ -13,7 +13,8 @@ const router = createRouter({
             name: "login",
             component: LoginView,
             meta: {
-                requiresAuth: false
+                requiresAuth: false,
+                title: 'Login'
             }
         },
         {
@@ -21,7 +22,8 @@ const router = createRouter({
             name: "databases",
             component: HomeView,
             meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                title: 'Home'
             }
         },
         {
@@ -29,7 +31,8 @@ const router = createRouter({
             name: "tables",
             component: DatabaseView,
             meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                title: '$DB'
             }
         },
     ],
@@ -50,6 +53,21 @@ router.beforeEach((to, from) => {
     }
 
     return true
+})
+
+router.afterEach((to) => {
+    let title = 'DB Weiv';
+
+    if (to.meta.title) {
+        title += ' - '
+        title += to.meta.title
+
+        if (title.includes('$DB')) {
+            title = title.replace('$DB', to.params.database)
+        }
+    }
+
+    document.title = title
 })
 
 export default router;

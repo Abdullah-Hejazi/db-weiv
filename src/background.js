@@ -48,11 +48,6 @@ function createWindow() {
     
         return false;
     });
-
-    win.on('minimize', function(event){
-        event.preventDefault();
-        win.hide();
-    });
 }
 
 // Quit when all windows are closed.

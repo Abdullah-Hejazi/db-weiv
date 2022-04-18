@@ -1,6 +1,6 @@
 <script>
 export default {
-    name: 'App',
+    name: 'DB Weiv - Database Viewer',
 
     data() {
         return {
@@ -75,7 +75,7 @@ export default {
         }
     },
 
-    mounted() {
+    created() {
         this.themes.forEach(theme => {
             let link = document.createElement('link');
             link.rel = "";
@@ -83,6 +83,11 @@ export default {
             link.href = '/themes/' + theme + '.css';
             document.head.appendChild(link);
         })
+
+        let link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = 'primeicons.css';
+        document.head.appendChild(link);
 
         this.theme = localStorage.getItem('theme') ?? 'arya-blue';
         this.SelectTheme()
