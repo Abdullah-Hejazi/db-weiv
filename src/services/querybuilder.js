@@ -273,7 +273,7 @@ class QueryBuilder {
             let values = column.values.split(',')
         
             // remove spaces from values
-            values = values.map(value => value.trim());
+            values = values.map(value => '\'' + value.trim() + '\'');
 
             return `(${values.join(', ')})`;
         }
