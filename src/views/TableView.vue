@@ -2,13 +2,15 @@
 
 import TableData from '@/components/TableData.vue'
 import TableStructure from '@/components/TableStructure.vue'
+import AddRowDialog from '@/components/AddRowDialog.vue'
 
 export default {
     name: 'TableView',
 
     components: {
         TableData,
-        TableStructure
+        TableStructure,
+        AddRowDialog
     },
 
     data() {
@@ -27,14 +29,14 @@ export default {
                     icon: 'pi pi-database',
                     command: () => {
                         this.activeIndex = 1
-                        this.LoadTableStructure()
+                        this.LoadTable()
                     }
                 }
             ],
 
             menuItems: [
                 {
-                    label: 'New Row',
+                    label: 'Insert Row',
                     icon: 'pi pi-plus',
                     command: () => this.newRow.active = true
                 },
@@ -82,7 +84,8 @@ export default {
                 '>='
             ],
             newRow: {
-                active: false
+                active: false,
+                header: 'Insert New Row',
             },
             moreOptions: {
                 active: false,
@@ -144,6 +147,7 @@ export default {
                     this.data = result.data[0][0]
                     this.columns = result.data[1][0]
                     this.pagination.total = result.data[0][1][0].count
+                    this.tableStructure = result.data[0][2]
                 } else {
                     this.error = result.error
                 }
@@ -222,25 +226,6 @@ export default {
                 this.moreOptions.icon = 'pi pi-angle-up'
                 this.moreOptions.label = 'Less Options'
             }
-        },
-
-        async LoadTableStructure() {
-            this.loading = true
-
-            this.tableStructure = []
-
-            await this.$store.dispatch('database/loadTableStructure', {
-                database: this.$route.params.database,
-                table: this.table
-            }).then(result => {
-                if (result.success) {
-                    this.tableStructure = result.data[0]
-                } else {
-                    this.error = result.error
-                }
-            }).finally(() => {
-                this.loading = false
-            })
         }
     },
 
@@ -281,11 +266,7 @@ export default {
             this.search.searching = false
             this.sort = null
             
-            if (this.activeIndex === 0) {
-                this.LoadTable()
-            } else if (this.activeIndex === 1) {
-                this.LoadTableStructure()
-            }
+            this.LoadTable()
 
         }
     },
@@ -314,7 +295,7 @@ export default {
             <BlockUI :blocked="loading">
                 <ScrollPanel class="w-full scroll-menu2">
                     <TableData :sortOrder="sortOrder" :sortField="sort?.field" :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
-                    <TableStructure :data="tableStructure" :load="LoadTableStructure" v-if="activeIndex == 1" />
+                    <TableStructure :data="tableStructure" v-if="activeIndex == 1" />
 
                     <div class="text-center mt-5" v-if="loading">
                         <ProgressSpinner />
@@ -366,6 +347,10 @@ export default {
                 <Button class="p-button-text p-button-plain" :icon="moreOptions.icon" :label="moreOptions.label" @click="MoreOptions" />
             </div>
         </Dialog>
+
+        <Dialog :header="newRow.header" v-model:visible="newRow.active" class="add-row-dialog" :modal="true">
+            <AddRowDialog :tableStructure="tableStructure" />
+        </Dialog>
     </div>
 </template>
 
@@ -386,5 +371,11 @@ export default {
 .search-dialog {
     width: 400px;
     max-width: 100vw;
+}
+
+.add-row-dialog {
+    width: 450px;
+    max-width: 100vw;
+    max-height: 80vh;
 }
 </style>

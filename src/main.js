@@ -35,6 +35,8 @@ import Column from 'primevue/column';
 import TabMenu from 'primevue/tabmenu';
 import Paginator from 'primevue/paginator';
 import ScrollTop from 'primevue/scrolltop';
+import Textarea from 'primevue/textarea';
+import Calendar from 'primevue/calendar';
 
 
 import App from "./App.vue";
@@ -76,6 +78,8 @@ app.component('Column', Column);
 app.component('TabMenu', TabMenu);
 app.component('Paginator', Paginator);
 app.component('ScrollTop', ScrollTop);
+app.component('Textarea', Textarea);
+app.component('Calendar', Calendar);
 
 
 app.directive('Tooltip', Tooltip);

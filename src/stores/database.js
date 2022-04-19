@@ -204,6 +204,8 @@ const database = {
             let result = []
 
             try {
+                let describeQuery = QueryBuilder.describe(form.database, form.table);
+    
                 let query = QueryBuilder.select('*');
                 query.from(form.database, form.table);
 
@@ -220,7 +222,7 @@ const database = {
     
                 query.limit(form.perPage).offset(form.page);
 
-                result = await dbservice.query(query.build(), countQuery.build())
+                result = await dbservice.query(query.build(), countQuery.build(), describeQuery)
 
             } catch (e) {
                 return {
@@ -259,26 +261,6 @@ const database = {
             context.commit('setData', null)
             context.commit('setConnected', false)
             await dbservice.endConnection();
-        },
-
-        async loadTableStructure(context, form) {
-            let result = []
-
-            try {
-                let query = QueryBuilder.describe(form.database, form.table)
-
-                result = await dbservice.query(query)
-            } catch (e) {
-                return {
-                    success: false,
-                    error: e.message
-                }
-            }
-
-            return {
-                success: true,
-                data: result
-            }
         }
     },
 }
