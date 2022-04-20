@@ -8,6 +8,7 @@ class QueryBuilder {
         this.type = '';
 
         this.fields = [];
+        this.vals = [];
 
         this.additions = [];
 
@@ -38,6 +39,17 @@ class QueryBuilder {
         }
     }
 
+    static insert(database, table) {
+        let queryBuilder = new QueryBuilder();
+        queryBuilder.type = 'INSERT';
+        queryBuilder.database = database;
+        queryBuilder.table = table;
+
+        queryBuilder.parameters.push(database, table);
+
+        return queryBuilder;
+    }
+
     clone() {
         let queryBuilder = new QueryBuilder();
         queryBuilder.type = this.type;
@@ -45,6 +57,7 @@ class QueryBuilder {
         queryBuilder.table = this.table;
 
         queryBuilder.fields = this.#cloneArray(this.fields);
+        queryBuilder.vals = this.#cloneArray(this.vals);
         queryBuilder.additions = this.#cloneArray(this.additions);
         queryBuilder.columns = this.#cloneArray(this.columns);
         queryBuilder.wheres = this.#cloneArray(this.wheres);
@@ -106,6 +119,27 @@ class QueryBuilder {
         };
     }
 
+    static delete (database, table, key, values) {
+        let query = `DELETE FROM ??.?? WHERE ?? IN (?)`;
+        let parameters = [database, table, key, values];
+
+        return {
+            query: query,
+            parameters: parameters
+        };
+    }
+
+    static update (database, table) {
+        let queryBuilder = new QueryBuilder();
+        queryBuilder.type = 'UPDATE';
+        queryBuilder.database = database;
+        queryBuilder.table = table;
+
+        queryBuilder.parameters.push(database, table);
+
+        return queryBuilder;
+    }
+
     static show(type) {
         let queryBuilder = new QueryBuilder();
         queryBuilder.type = type;
@@ -123,34 +157,42 @@ class QueryBuilder {
     }
 
     where(field, operator, value) {
-        this.wheres.push('?? ' + operator + ' ?');
-
         if (operator == 'LIKE') {
-            value = `%${value}%`;
+            value = `%${value}%`
         }
 
-        this.parameters.push(field, value);
+        this.wheres.push({
+            field: field,
+            operator: operator,
+            value: value
+        });
 
         return this;
     }
 
     orderBy(field, direction) {
-        this.additions.push(`ORDER BY ?? ${direction}`);
-        this.parameters.push(field);
+        this.additions.push({
+            query: `ORDER BY ?? ${direction}`,
+            value: field
+        });
 
         return this;
     }
 
     limit(limit) {
-        this.additions.push(`LIMIT ?`);
-        this.parameters.push(limit);
+        this.additions.push({
+            query: `LIMIT ?`,
+            value: limit
+        });
 
         return this;
     }
 
     offset(offset) {
-        this.additions.push(`OFFSET ?`);
-        this.parameters.push(offset);
+        this.additions.push({
+            query: `OFFSET ?`,
+            value: offset
+        });
 
         return this;
     }
@@ -210,13 +252,24 @@ class QueryBuilder {
     }
 
     addIndex(type, index) {
-        this.indexes.push(`${type} (??)`);
-        this.parameters.push(index);
+        this.indexes.push({
+            query: `${type} (??)`,
+            value: index
+        });
+    }
+
+    addInsertion(column, value) {
+        this.fields.push({
+            column: column,
+            value: value
+        });
     }
 
     addUnique(index) {
-        this.indexes.push(`CONSTRAINT UNIQUE_${index} UNIQUE (??)`);
-        this.parameters.push(index);
+        this.indexes.push({
+            query: `CONSTRAINT UNIQUE_${index} UNIQUE (??)`,
+            value: index
+        });
     }
 
     engine(engine) {
@@ -240,6 +293,10 @@ class QueryBuilder {
             return this.#buildShow();
         } else if (this.type == 'CREATE TABLE') {
             return this.#buildCreateTable();
+        } else if (this.type == 'INSERT') {
+            return this.#buildInsert();
+        } else if (this.type == 'UPDATE') {
+            return this.#buildUpdate();
         }
     }
 
@@ -333,11 +390,15 @@ class QueryBuilder {
         if (this.wheres.length > 0) {
             query += ' WHERE ';
 
-            query += this.wheres.join(' AND ');
+            query += this.wheres.map(where => `?? ${where.operator} ?`).join(' AND ');
+            this.wheres.forEach(where => {
+                this.parameters.push(where.field, where.value);
+            })
         }
 
         this.additions.forEach (addition => {
-            query += ` ${addition}`;
+            query += ` ${addition.query}`;
+            this.parameters.push(addition.value);
         })
 
         return {
@@ -382,6 +443,50 @@ class QueryBuilder {
 
     #cloneArray(array) {
         return array.map(item => item);
+    }
+
+    #buildInsert() {
+        let query = `INSERT INTO ??.?? `;
+
+        query += ` (${this.fields.map(field => '??').join(', ')})`;
+        this.fields.forEach (field => {
+            this.parameters.push(field.column);
+        })
+
+        query += ` VALUES (${this.fields.map(field => '?').join(', ')})`;
+        this.fields.forEach (field => {
+            this.parameters.push(field.value);
+        })
+
+        return {
+            query: query,
+            parameters: this.parameters
+        };
+    }
+
+    #buildUpdate() {
+        let query = `UPDATE ??.?? SET `;
+
+        query += this.fields.map(field => `?? = ?`).join(', ');
+
+        this.fields.forEach (field => {
+            this.parameters.push(field.column);
+            this.parameters.push(field.value);
+        })
+
+        if (this.wheres.length > 0) {
+            query += ' WHERE ';
+
+            query += this.wheres.map(where => `?? ${where.operator} ?`).join(' AND ');
+            this.wheres.forEach(where => {
+                this.parameters.push(where.field, where.value);
+            })
+        }
+
+        return {
+            query: query,
+            parameters: this.parameters
+        };
     }
 }
 

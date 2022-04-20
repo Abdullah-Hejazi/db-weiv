@@ -205,7 +205,7 @@ const database = {
 
             try {
                 let describeQuery = QueryBuilder.describe(form.database, form.table);
-    
+
                 let query = QueryBuilder.select('*');
                 query.from(form.database, form.table);
 
@@ -254,6 +254,69 @@ const database = {
             return {
                 success: false,
                 data: result
+            }
+        },
+
+        async insertRow(context, form) {
+            try {
+                let query = QueryBuilder.insert(form.database, form.table);
+
+                for (const field in form.row) {
+                    query.addInsertion(field, form.row[field]);
+                }
+
+                await dbservice.query(query.build())
+            } catch (e) {
+                return {
+                    success: false,
+                    error: e.message
+                }
+            }
+
+            return {
+                success: true
+            }
+        },
+
+        async updateRow(context, form) {
+            try {
+                let query = QueryBuilder.update(form.database, form.table);
+
+                query.where(form.key, '=', form.original[form.key]);
+
+                for (const field in form.row) {
+                    if (form.row[field] !== form.original[field]) {
+                        query.addInsertion(field, form.row[field]);
+                    }
+                }
+
+                await dbservice.query(query.build())
+            } catch (e) {
+                return {
+                    success: false,
+                    error: e.message
+                }
+            }
+
+            return {
+                success: true
+            }
+        },
+
+        async deleteRows(context, form) {
+            try {
+                let query = QueryBuilder.delete(form.database, form.table, form.key, form.values);
+
+                await dbservice.query(query)
+            } catch (e) {
+                return {
+                    success: false,
+                    error: e.message
+                }
+            }
+
+            return {
+                success: true
             }
         },
 

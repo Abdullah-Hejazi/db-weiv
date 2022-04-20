@@ -2,7 +2,8 @@
 
 import TableData from '@/components/TableData.vue'
 import TableStructure from '@/components/TableStructure.vue'
-import AddRowDialog from '@/components/AddRowDialog.vue'
+import RowDialog from '@/components/RowDialog.vue'
+import CellDialog from '@/components/CellDialog.vue'
 
 export default {
     name: 'TableView',
@@ -10,7 +11,8 @@ export default {
     components: {
         TableData,
         TableStructure,
-        AddRowDialog
+        RowDialog,
+        CellDialog
     },
 
     data() {
@@ -85,14 +87,25 @@ export default {
             ],
             newRow: {
                 active: false,
-                header: 'Insert New Row',
+                error: ''
+            },
+            editRow: {
+                active: false,
+                data: null,
+                error: ''
+            },
+            editCell: {
+                active: false,
+                error: '',
+                data: null
             },
             moreOptions: {
                 active: false,
                 label: 'More Options',
                 icon: 'pi pi-angle-down'
             },
-            tableStructure: []
+            tableStructure: [],
+            tableKey: ''
         }
     },
 
@@ -148,11 +161,23 @@ export default {
                     this.columns = result.data[1][0]
                     this.pagination.total = result.data[0][1][0].count
                     this.tableStructure = result.data[0][2]
+                    this.LoadTableKey()
                 } else {
                     this.error = result.error
                 }
             }).finally(() => {
                 this.loading = false
+            })
+        },
+
+        LoadTableKey () {
+            this.tableKey = '';
+
+            this.tableStructure.forEach(column => {
+                if (column.Key === 'PRI' || column.Key === 'UNI') {
+                    this.tableKey = column.Field
+                    return;
+                }
             })
         },
 
@@ -226,6 +251,130 @@ export default {
                 this.moreOptions.icon = 'pi pi-angle-up'
                 this.moreOptions.label = 'Less Options'
             }
+        },
+
+        async InsertRow(row) {
+            this.loading = true
+            this.newRow.error = ''
+
+            await this.$store.dispatch('database/insertRow', {
+                database: this.$route.params.database,
+                table: this.table,
+                row: row
+            }).then(result => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Row inserted',
+                        detail:'Row has been inserted successfully',
+                        life: 3000
+                    });
+                    this.newRow.active = false
+                } else {
+                    this.newRow.error = result.error
+                }
+            }).finally(() => {
+                this.LoadTable()
+                this.loading = false
+            })
+        },
+
+        EditRow(row) {
+            this.editRow.data = row;
+            this.editRow.error = '';
+            this.editRow.active = true;
+        },
+
+        async UpdateRow(row, original) {
+            this.loading = true
+            this.editRow.error = ''
+
+            await this.$store.dispatch('database/updateRow', {
+                database: this.$route.params.database,
+                table: this.table,
+                row: row,
+                original: original,
+                key: this.tableKey
+            }).then(result => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Row updated',
+                        detail:'Row has been updated successfully',
+                        life: 3000
+                    });
+
+                    this.editRow.active = false
+                } else {
+                    this.editRow.error = result.error
+                }
+            }).finally(() => {
+                this.LoadTable()
+                this.loading = false
+            })
+        },
+
+        async DeleteRow(row) {
+            let rows = row.map(r => r[this.tableKey])
+
+            this.loading = true
+
+            await this.$store.dispatch('database/deleteRows', {
+                database: this.$route.params.database,
+                table: this.table,
+                key: this.tableKey,
+                values: rows
+            }).then(result => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Row deleted',
+                        detail:'Rows have been deleted successfully',
+                        life: 3000
+                    });
+                } else {
+                    this.error = result.error
+                }
+            }).finally(() => {
+                this.LoadTable()
+                this.loading = false
+            })
+        },
+
+        EditCell(cell) {
+            this.editCell.active = true;
+            this.editCell.data = cell
+        },
+
+        async UpdateCell(column, newValue) {
+            this.loading = true
+            this.editCell.error = ''
+
+            await this.$store.dispatch('database/updateRow', {
+                database: this.$route.params.database,
+                table: this.table,
+                row: {
+                    [column]: newValue
+                },
+                original: this.editCell.data.data,
+                key: this.tableKey
+            }).then(result => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Row updated',
+                        detail:'Row has been updated successfully',
+                        life: 3000
+                    });
+
+                    this.editCell.active = false
+                } else {
+                    this.editCell.error = result.error
+                }
+            }).finally(() => {
+                this.LoadTable()
+                this.loading = false
+            })
         }
     },
 
@@ -294,7 +443,21 @@ export default {
 
             <BlockUI :blocked="loading">
                 <ScrollPanel class="w-full scroll-menu2">
-                    <TableData :sortOrder="sortOrder" :sortField="sort?.field" :loading="loading" :error="error" :data="data" :sort="SortChange" :columns="columns" v-if="activeIndex == 0 && loading == false" />
+                    <TableData
+                        :editCell="EditCell"
+                        :hasKey="tableKey !== ''"
+                        :editRow="EditRow"
+                        :deleteRow="DeleteRow"
+                        :sortOrder="sortOrder"
+                        :sortField="sort?.field"
+                        :loading="loading"
+                        :error="error"
+                        :data="data"
+                        :sort="SortChange"
+                        :columns="columns"
+                        v-if="activeIndex == 0 && loading == false"
+                    />
+
                     <TableStructure :data="tableStructure" v-if="activeIndex == 1" />
 
                     <div class="text-center mt-5" v-if="loading">
@@ -348,8 +511,16 @@ export default {
             </div>
         </Dialog>
 
-        <Dialog :header="newRow.header" v-model:visible="newRow.active" class="add-row-dialog" :modal="true">
-            <AddRowDialog :tableStructure="tableStructure" />
+        <Dialog header="Insert New Row" v-model:visible="newRow.active" class="add-row-dialog" :modal="true">
+            <RowDialog :error="newRow.error" :tableStructure="tableStructure" :finish="InsertRow" />
+        </Dialog>
+
+        <Dialog header="Edit Row" v-model:visible="editRow.active" class="add-row-dialog" :modal="true">
+            <RowDialog :row="editRow.data" :error="editRow.error" :tableStructure="tableStructure" :finish="UpdateRow" />
+        </Dialog>
+
+        <Dialog :header="'Edit ' + editCell?.data?.field" v-model:visible="editCell.active" class="add-row-dialog" :modal="true">
+            <CellDialog :finish="UpdateCell" :tableKey="tableKey" :data="editCell.data" :error="editCell.error" :tableStructure="tableStructure" />
         </Dialog>
     </div>
 </template>
