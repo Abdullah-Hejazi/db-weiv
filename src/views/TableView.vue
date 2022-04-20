@@ -82,7 +82,8 @@ export default {
                 '<',
                 '>',
                 '<=',
-                '>='
+                '>=',
+                'IN'
             ],
             newRow: {
                 active: false,

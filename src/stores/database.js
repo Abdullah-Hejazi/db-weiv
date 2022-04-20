@@ -305,9 +305,11 @@ const database = {
 
         async deleteRows(context, form) {
             try {
-                let query = QueryBuilder.delete(form.database, form.table, form.key, form.values);
+                let query = QueryBuilder.delete(form.database, form.table);
 
-                await dbservice.query(query)
+                query.where(form.key, 'IN', form.values);
+
+                await dbservice.query(query.build())
             } catch (e) {
                 return {
                     success: false,

@@ -70,6 +70,11 @@ export default {
     watch: {
         selectedRows: function(val) {
             this.menuModel[0].visible = this.hasKey && val.length < 2
+        },
+
+        hasKey: function(val) {
+            this.menuModel[0].visible = this.hasKey && this.selectedRows.length < 2
+            this.menuModel[1].visible = this.hasKey
         }
     }
 }

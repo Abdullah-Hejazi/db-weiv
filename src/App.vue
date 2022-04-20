@@ -101,7 +101,7 @@ export default {
     <Toast />
 
     <p id="db-weiv-loading-module">
-        <ProgressSpinner :strokeWidth="3" class="db-weiv-loading-module-spinner" />
+        <ProgressSpinner strokeWidth="3" class="db-weiv-loading-module-spinner" />
     </p>
 
     <header>

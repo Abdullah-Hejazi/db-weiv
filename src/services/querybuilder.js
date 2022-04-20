@@ -45,8 +45,6 @@ class QueryBuilder {
         queryBuilder.database = database;
         queryBuilder.table = table;
 
-        queryBuilder.parameters.push(database, table);
-
         return queryBuilder;
     }
 
@@ -104,8 +102,6 @@ class QueryBuilder {
         queryBuilder.database = database;
         queryBuilder.table = table;
 
-        queryBuilder.parameters.push(database, table);
-
         return queryBuilder;
     }
 
@@ -119,23 +115,21 @@ class QueryBuilder {
         };
     }
 
-    static delete (database, table, key, values) {
-        let query = `DELETE FROM ??.?? WHERE ?? IN (?)`;
-        let parameters = [database, table, key, values];
+    static delete (database, table) {
+        let queryBuilder = new QueryBuilder();
+        queryBuilder.type = 'DELETE';
+        queryBuilder.database = database;
+        queryBuilder.table = table;
 
-        return {
-            query: query,
-            parameters: parameters
-        };
+        return queryBuilder;
     }
+        
 
     static update (database, table) {
         let queryBuilder = new QueryBuilder();
         queryBuilder.type = 'UPDATE';
         queryBuilder.database = database;
         queryBuilder.table = table;
-
-        queryBuilder.parameters.push(database, table);
 
         return queryBuilder;
     }
@@ -151,14 +145,24 @@ class QueryBuilder {
         this.database = database;
         this.table = table;
 
-        this.parameters.push(this.database, this.table);
-
         return this;
     }
 
     where(field, operator, value) {
+        var vals = []
+
         if (operator == 'LIKE') {
             value = `%${value}%`
+        }
+
+        if (operator == 'IN') {
+            if (typeof value == 'string') {
+                vals = value.split(',');
+            } else {
+                vals = value
+            }
+
+            value = '(' + vals.map(item => `'${item.trim()}'`).join(',') + ')';
         }
 
         this.wheres.push({
@@ -196,34 +200,6 @@ class QueryBuilder {
 
         return this;
     }
-
-    /*
-        addColumn(name, type, size, defaultValue, nullable, autoIncrement, primaryKey) {
-            if (this.columnsCount > 0) {
-                this.query += ', ';
-            }
-
-            this.query += `${name} ${type}${this.getSize(type, size)}`;
-
-            if (defaultValue) {
-                this.query += ` DEFAULT ${defaultValue}`;
-            }
-
-            if (! nullable) {
-                this.query += ' NOT NULL';
-            }
-
-            if (autoIncrement) {
-                this.query += ' AUTO_INCREMENT';
-            }
-
-            if (primaryKey) {
-                this.query += ' PRIMARY KEY';
-            }
-
-            this.columnsCount++;
-        }
-    */
 
     addColumn(data) {
         let query = `${data.name} ${data.type.label}`;
@@ -263,6 +239,8 @@ class QueryBuilder {
             column: column,
             value: value
         });
+
+        return this
     }
 
     addUnique(index) {
@@ -273,17 +251,24 @@ class QueryBuilder {
     }
 
     engine(engine) {
-        this.additions.push(`ENGINE = ?`);
-        this.parameters.push(engine);
+        this.additions.push({
+            query: `ENGINE = ?`,
+            value: engine
+        });
 
         return this;
     }
 
     collation(collation) {
-        this.additions.push(`CHARACTER SET = ? COLLATE = ?`);
+        this.additions.push({
+            query: `CHARACTER SET = ?`,
+            value: collation.CHARACTER_SET_NAME
+        })
 
-        this.parameters.push(collation.CHARACTER_SET_NAME);
-        this.parameters.push(collation.COLLATION_NAME);
+        this.additions.push({
+            query: `COLLATE = ?`,
+            value: collation.COLLATION_NAME
+        });
     }
 
     build() {
@@ -297,6 +282,8 @@ class QueryBuilder {
             return this.#buildInsert();
         } else if (this.type == 'UPDATE') {
             return this.#buildUpdate();
+        } else if (this.type == 'DELETE') {
+            return this.#buildDelete();
         }
     }
 
@@ -385,15 +372,21 @@ class QueryBuilder {
 
         if (this.database && this.table) {
             query += ` FROM ??.??`;
+            this.parameters.push(this.database, this.table);
         }
 
         if (this.wheres.length > 0) {
             query += ' WHERE ';
 
-            query += this.wheres.map(where => `?? ${where.operator} ?`).join(' AND ');
-            this.wheres.forEach(where => {
+            query += this.wheres.map(where => {
+                if (where.operator == 'IN') {
+                    this.parameters.push(where.field);
+                    return `?? ${where.operator} ${where.value}`;
+                }
+
                 this.parameters.push(where.field, where.value);
-            })
+                return `?? ${where.operator} ?`;
+            }).join(' AND ');
         }
 
         this.additions.forEach (addition => {
@@ -425,14 +418,27 @@ class QueryBuilder {
     #buildCreateTable() {
         let query = `CREATE TABLE ??.?? (`;
 
-        let data = [...this.columns, ...this.indexes, ...this.uniques];
+        this.parameters.push(this.database, this.table);
 
-        query += data.join(', ');
+        // query += this.columns.join(', ');
+
+        let indexes = this.indexes.map(index => {
+            this.parameters.push(index.value);
+            return `${index.query}`;
+        });
+
+        let uniques = this.uniques.map(unique => {
+            this.parameters.push(unique.value);
+            return `${unique.query}`;
+        });
+
+        query += [...this.columns, ...indexes, ...uniques].join(', ');
 
         query += ')';
 
         this.additions.forEach (addition => {
-            query += ` ${addition}`;
+            query += ` ${addition.query}`;
+            this.parameters.push(addition.value);
         })
 
         return {
@@ -447,6 +453,8 @@ class QueryBuilder {
 
     #buildInsert() {
         let query = `INSERT INTO ??.?? `;
+
+        this.parameters.push(this.database, this.table);
 
         query += ` (${this.fields.map(field => '??').join(', ')})`;
         this.fields.forEach (field => {
@@ -467,6 +475,8 @@ class QueryBuilder {
     #buildUpdate() {
         let query = `UPDATE ??.?? SET `;
 
+        this.parameters.push(this.database, this.table);
+
         query += this.fields.map(field => `?? = ?`).join(', ');
 
         this.fields.forEach (field => {
@@ -477,10 +487,40 @@ class QueryBuilder {
         if (this.wheres.length > 0) {
             query += ' WHERE ';
 
-            query += this.wheres.map(where => `?? ${where.operator} ?`).join(' AND ');
-            this.wheres.forEach(where => {
+            query += this.wheres.map(where => {
+                if (where.operator == 'IN') {
+                    this.parameters.push(where.field);
+                    return `?? ${where.operator} ${where.value}`;
+                }
+
                 this.parameters.push(where.field, where.value);
-            })
+                return `?? ${where.operator} ?`;
+            }).join(' AND ');
+        }
+
+        return {
+            query: query,
+            parameters: this.parameters
+        };
+    }
+
+    #buildDelete() {
+        let query = `DELETE FROM ??.??`;
+
+        this.parameters.push(this.database, this.table);
+
+        if (this.wheres.length > 0) {
+            query += ' WHERE ';
+
+            query += this.wheres.map(where => {
+                if (where.operator == 'IN') {
+                    this.parameters.push(where.field);
+                    return `?? ${where.operator} ${where.value}`;
+                }
+
+                this.parameters.push(where.field, where.value);
+                return `?? ${where.operator} ?`;
+            }).join(' AND ');
         }
 
         return {
