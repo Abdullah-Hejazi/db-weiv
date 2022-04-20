@@ -36,6 +36,8 @@ export default {
 
     methods: {
         async CreateDatabase() {
+            this.$loading.show()
+
             this.$store.dispatch('database/createDatabase', this.newDatabase).then((result) => {
                 if (result.success) {
                     this.newDatabase.name = '';
@@ -53,11 +55,14 @@ export default {
                 } else {
                     this.newDBError = result.error;
                 }
+            }).finally(() => {
+                this.$loading.hide()
             })
         },
 
         async RefreshDatabase() {
             this.error = ''
+            this.$loading.show()
 
             this.home.label = ' ' + this.$store.state.database.data?.host
 
@@ -65,10 +70,14 @@ export default {
                 if (! result.success) {
                     this.error = result.error;
                 }
+            }).finally(() => {
+                this.$loading.hide()
             })
         },
 
         async DeleteDatabase(database) {
+            this.$loading.show()
+
             this.$store.dispatch('database/dropDatabase', database.SCHEMA_NAME).then((result) => {
                 if (result.success) {
                     this.$toast.add({
@@ -82,6 +91,8 @@ export default {
                 } else {
                     this.error = result.error;
                 }
+            }).finally(() => {
+                this.$loading.hide()
             })
         },
     }

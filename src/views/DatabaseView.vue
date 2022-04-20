@@ -40,6 +40,7 @@ export default {
     methods: {
         RefreshTables() {
             this.error = ''
+            this.$loading.show()
 
             this.$store.dispatch('database/getDatabase', this.$route.params.database).then((result) => {
                 this.tables = []
@@ -70,6 +71,8 @@ export default {
                 }
             }).catch((error) => {
                 this.error = error
+            }).finally(() => {
+                this.$loading.hide()
             })
         },
 

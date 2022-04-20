@@ -68,7 +68,6 @@ export default {
             columns: [],
             sort: null,
             error: '',
-            loading: false,
             search: {
                 active: false,
                 value: '',
@@ -150,7 +149,7 @@ export default {
                 form.search = this.search
             }
 
-            this.loading = true
+            this.$loading.show()
 
             this.data = []
             this.columns = []
@@ -166,7 +165,7 @@ export default {
                     this.error = result.error
                 }
             }).finally(() => {
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
@@ -209,7 +208,7 @@ export default {
         },
 
         async DropTable() {
-            this.loading = true
+            this.$loading.show()
 
             await this.$store.dispatch('database/dropTable', {
                 database: this.$route.params.database,
@@ -228,7 +227,7 @@ export default {
 
             }).finally(() => {
                 this.DropTableEnd()
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
@@ -254,7 +253,7 @@ export default {
         },
 
         async InsertRow(row) {
-            this.loading = true
+            this.$loading.show()
             this.newRow.error = ''
 
             await this.$store.dispatch('database/insertRow', {
@@ -275,7 +274,7 @@ export default {
                 }
             }).finally(() => {
                 this.LoadTable()
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
@@ -286,7 +285,7 @@ export default {
         },
 
         async UpdateRow(row, original) {
-            this.loading = true
+            this.$loading.show()
             this.editRow.error = ''
 
             await this.$store.dispatch('database/updateRow', {
@@ -310,14 +309,14 @@ export default {
                 }
             }).finally(() => {
                 this.LoadTable()
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
         async DeleteRow(row) {
             let rows = row.map(r => r[this.tableKey])
 
-            this.loading = true
+            this.$loading.show()
 
             await this.$store.dispatch('database/deleteRows', {
                 database: this.$route.params.database,
@@ -337,7 +336,7 @@ export default {
                 }
             }).finally(() => {
                 this.LoadTable()
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
@@ -347,7 +346,7 @@ export default {
         },
 
         async UpdateCell(column, newValue) {
-            this.loading = true
+            this.$loading.show()
             this.editCell.error = ''
 
             await this.$store.dispatch('database/updateRow', {
@@ -373,7 +372,7 @@ export default {
                 }
             }).finally(() => {
                 this.LoadTable()
-                this.loading = false
+                this.$loading.hide()
             })
         }
     },
@@ -441,41 +440,34 @@ export default {
                 />
             </template>
 
-            <BlockUI :blocked="loading">
-                <ScrollPanel class="w-full scroll-menu2">
-                    <TableData
-                        :editCell="EditCell"
-                        :hasKey="tableKey !== ''"
-                        :editRow="EditRow"
-                        :deleteRow="DeleteRow"
-                        :sortOrder="sortOrder"
-                        :sortField="sort?.field"
-                        :loading="loading"
-                        :error="error"
-                        :data="data"
-                        :sort="SortChange"
-                        :columns="columns"
-                        v-if="activeIndex == 0 && loading == false"
-                    />
-
-                    <TableStructure :data="tableStructure" v-if="activeIndex == 1" />
-
-                    <div class="text-center mt-5" v-if="loading">
-                        <ProgressSpinner />
-                    </div>
-                </ScrollPanel>
-
-                <Paginator
+            <ScrollPanel class="w-full scroll-menu2">
+                <TableData
+                    :editCell="EditCell"
+                    :hasKey="tableKey !== ''"
+                    :editRow="EditRow"
+                    :deleteRow="DeleteRow"
+                    :sortOrder="sortOrder"
+                    :sortField="sort?.field"
+                    :error="error"
+                    :data="data"
+                    :sort="SortChange"
+                    :columns="columns"
                     v-if="activeIndex == 0"
-                    v-model:first="pagination.page"
-                    :rows="pagination.perPage"
-                    :totalRecords="pagination.total"
-                    :rowsPerPageOptions="rowOptions"
-                    v-model:rows="pagination.perPage"
-                    @page="PageChange"
-                    :pageLinkSize="3"
                 />
-            </BlockUI>
+
+                <TableStructure :data="tableStructure" v-if="activeIndex == 1" />
+            </ScrollPanel>
+
+            <Paginator
+                v-if="activeIndex == 0"
+                v-model:first="pagination.page"
+                :rows="pagination.perPage"
+                :totalRecords="pagination.total"
+                :rowsPerPageOptions="rowOptions"
+                v-model:rows="pagination.perPage"
+                @page="PageChange"
+                :pageLinkSize="3"
+            />
         </Panel>
 
         <!-- Dialogs -->

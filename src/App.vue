@@ -100,6 +100,10 @@ export default {
     <ConfirmDialog />
     <Toast />
 
+    <p id="db-weiv-loading-module">
+        <ProgressSpinner :strokeWidth="3" class="db-weiv-loading-module-spinner" />
+    </p>
+
     <header>
         <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
             <div class="flex align-items-center">
@@ -134,5 +138,23 @@ body {
 .theme-selector {
     max-width: 100%;
     width: 200px;
+}
+
+#db-weiv-loading-module {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 0px;
+    background-color: rgba(0, 0, 0, 0.493);
+    z-index: 2500;
+    display: none;
+}
+
+.db-weiv-loading-module-spinner {
+    margin-top: calc(50vh - 50px);
+    margin-left: calc(50vw - 50px);
 }
 </style>

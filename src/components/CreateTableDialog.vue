@@ -44,8 +44,6 @@ export default {
                 id: -1
             },
 
-            loading: false,
-
             moreOptions: {
                 active: false,
                 label: 'More Options',
@@ -156,7 +154,7 @@ export default {
                 return column
             })
 
-            this.loading = true
+            this.$loading.show()
 
             await this.$store.dispatch('database/createTable', form).then(result => {
                 if (result.success) {
@@ -174,7 +172,7 @@ export default {
             }).catch(error => {
                 this.error = error.message
             }).finally(() => {
-                this.loading = false
+                this.$loading.hide()
             })
         },
 
@@ -291,7 +289,7 @@ export default {
         </div>
 
         <div class="text-center mt-4">
-            <Button :loading="loading" @click="CreateTable" label="Create Table" style="width: 300px; max-width: 100%;" />
+            <Button @click="CreateTable" label="Create Table" style="width: 300px; max-width: 100%;" />
         </div>
 
         <div class="text-center mt-2">

@@ -43,6 +43,7 @@ import ContextMenu from 'primevue/contextmenu';
 import App from "./App.vue";
 import router from "./router";
 import store from '@/stores/store';
+import LoadingPlugin from "@/services/loading";
 
 const app = createApp(App);
 
@@ -87,5 +88,7 @@ app.component('ContextMenu', ContextMenu);
 app.directive('Tooltip', Tooltip);
 app.use(ToastService);
 app.use(ConfirmationService);
+
+app.use(LoadingPlugin);
 
 app.mount("#app");

@@ -17,7 +17,6 @@ export default {
                 port: null,
                 displayName: ''
             },
-            loading: false,
             moreOptions: {
                 text: 'More Options',
                 icon: 'pi pi-angle-down',
@@ -43,7 +42,7 @@ export default {
         },
 
         async PerformLogin(data) {
-            this.loading = true
+            this.$loading.show()
 
             this.error = ''
 
@@ -56,7 +55,7 @@ export default {
             } catch (error) {
                 this.error = error.message
             } finally {
-                this.loading = false
+                this.$loading.hide()
             }
         },
 
@@ -269,9 +268,6 @@ export default {
                 </div>
             </template>
         </Dialog>
-
-        <BlockUI :blocked="loading" :fullScreen="true" :baseZIndex="-1" />
-        <ProgressSpinner class="spinner" v-if="loading" />
     </div>
 </template>
 
@@ -292,12 +288,5 @@ export default {
 
 .display-name-dialog {
     width: 400px;
-}
-
-.spinner {
-    position: fixed;
-    top: calc(50% - 75px);
-    left: calc(50% - 75px);
-    z-index: 5;
 }
 </style>

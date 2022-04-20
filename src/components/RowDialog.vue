@@ -12,7 +12,6 @@ export default {
 
     data () {
         return {
-            loading: false,
             data: {},
             original: {},
             types: {
