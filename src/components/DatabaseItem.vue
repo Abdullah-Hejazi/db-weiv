@@ -6,7 +6,7 @@ export default {
         return {
             items: [
                 {
-                    label: 'Drop',
+                    label: this.$t('home.drop_database'),
                     icon: 'pi pi-fw pi-trash',
                     command: this.DeleteDatabaseDialog
                 }
@@ -61,12 +61,14 @@ export default {
         DeleteDatabaseDoubleCheck() {
             this.deleteDatabaseDialog = false
             this.$confirm.require({
-                header: 'Area you really sure ?',
-                message: 'The process of DROPPING the database [' + this.database.SCHEMA_NAME + '] is irreversible, Do you want to procceed?',
+                header: this.$t('home.drop_database_ask'),
+                message: this.$t('home.drop_database_ask_message', { database: this.database.SCHEMA_NAME }),
                 icon: 'pi pi-exclamation-triangle',
                 acceptClass: 'p-button-danger',
                 rejectClass: 'p-button-plain p-button-text',
                 autofocus: false,
+                acceptLabel: this.$t('general.delete'),
+                rejectLabel: this.$t('general.cancel'),
                 accept: () => {
                     this.delete(this.database)
                 }
@@ -99,14 +101,14 @@ export default {
             <Menu id="menu" :model="items" ref="menu" :popup="true" />
         </div>
 
-        <Dialog :draggable="false" :modal="true" header="Delete the database ?" class="db-dialog" v-model:visible="deleteDatabaseDialog" >
+        <Dialog :draggable="false" :modal="true" :header="$t('home.drop_database_confirm')" class="db-dialog" v-model:visible="deleteDatabaseDialog" >
             <InlineMessage severity="error" class="mb-3 w-full">
-                Are you sure you want to DROP the <pre class="inline"> {{ database.SCHEMA_NAME }} </pre> database ?
+                {{ $t('home.drop_database_confirm_message', {database: database.SCHEMA_NAME}) }}
             </InlineMessage>
 
             <template #footer>
-                <Button label="Cancel" @click="deleteDatabaseDialog = false" class="p-button-text p-button-plain" />
-                <Button label="Delete" @click="DeleteDatabaseDoubleCheck" class="p-button-danger" />
+                <Button :label="$t('general.cancel')" @click="deleteDatabaseDialog = false" class="p-button-text p-button-plain" />
+                <Button :label="$t('general.delete')" @click="DeleteDatabaseDoubleCheck" class="p-button-danger" />
             </template>
         </Dialog>
 

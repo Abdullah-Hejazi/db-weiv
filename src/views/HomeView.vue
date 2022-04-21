@@ -44,8 +44,8 @@ export default {
                     this.createDatabaseDialog = false;
                     this.$toast.add({
                         severity:'success',
-                        summary: 'Database created',
-                        detail:'Database has been created successfully',
+                        summary: this.$t('home.database_created'),
+                        detail: this.$t('home.database_created_message'),
                         life: 3000
                     });
 
@@ -82,8 +82,8 @@ export default {
                 if (result.success) {
                     this.$toast.add({
                         severity:'success',
-                        summary: 'Database Dropped Successfully',
-                        detail:'Database has been dropped successfully',
+                        summary: this.$t('home.database_deleted'),
+                        detail: this.$t('home.database_deleted_message'),
                         life: 3000
                     });
 
@@ -105,17 +105,17 @@ export default {
         <Breadcrumb :home="home" :model="items" />
 
         <div class="text-center text-2xl my-3">
-            <div>Databases</div>
+            <div>{{ $t('home.databases') }}</div>
             <div class="flex justify-content-center align-items-center mt-1">
                 <Button
                     icon="pi pi-plus"
-                    label="Create Database"
+                    :label="$t('home.create_database')"
                     class="ml-3 p-button-text p-button-primary"
                     @click="createDatabaseDialog = true"
                 />
                 <Button
                     icon="pi pi-refresh"
-                    label="Refresh Databases"
+                    :label="$t('home.refresh_databases')"
                     class="p-button-text p-button-secondary"
                     @click="RefreshDatabase"
                 />
@@ -139,20 +139,20 @@ export default {
             />
         </div>
 
-        <Dialog header="Create new Database" :modal="true" v-model:visible="createDatabaseDialog" class="display-name-dialog text-sm">
+        <Dialog :header="$t('home.create_new_database')" :modal="true" v-model:visible="createDatabaseDialog" class="display-name-dialog text-sm">
             <InlineMessage severity="error" v-if="newDBError" class="mb-3 w-full scalein">
                 {{ newDBError }}
             </InlineMessage>
             
             <div>
-                <InputText placeholder="Display Name" v-model="newDatabase.name" class="w-full mt-3" />
+                <InputText :placeholder="$t('home.database_name')" v-model="newDatabase.name" class="w-full mt-3" />
 
                 <Dropdown
                     class="w-full mt-3"
                     v-model="newDatabase.collation"
                     :options="$store.state.database.collations"
                     optionLabel="COLLATION_NAME"
-                    placeholder="Select Collation"
+                    :placeholder="$t('home.select_collation')"
                     option-group-children="items"
                 />
             </div>
@@ -160,11 +160,11 @@ export default {
             <template #footer>
                 <div class="flex justify-content-between">
                     <Button
-                        label="Cancel"
+                        :label="$t('general.cancel')"
                         @click="createDatabaseDialog = false"
                         class="p-button-text"
                     />
-                    <Button label="Create" @click="CreateDatabase" />
+                    <Button :label="$t('home.create_database')" @click="CreateDatabase" />
                 </div>
             </template>
         </Dialog>

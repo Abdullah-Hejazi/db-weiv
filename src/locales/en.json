@@ -8,7 +8,9 @@
         "lessOptions": "Less Options",
         "moreOptions": "More Options",
         "settings": "Settings",
-        "language": "Language"
+        "language": "Language",
+        "success": "Success",
+        "delete": "Delete"
     },
 
     "login": {
@@ -27,5 +29,23 @@
         "passwordNote": "Note",
         "passwordNoteText": "storing passwords is generally not recommended, if you choose not to, you'll be prompt to enter the password on subsequent logins !",
         "typePassword": "Type the password"
+    },
+
+    "home": {
+        "databases": "Databases",
+        "create_database": "Create Database",
+        "refresh_databases": "Refresh Databases",
+        "create_new_database": "Create New Database",
+        "database_name": "Database Name",
+        "select_collation": "Select Collation",
+        "drop_database": "Drop Database",
+        "drop_database_confirm": "Delete the database ?",
+        "drop_database_confirm_message": "Are you sure you want to DROP the [{database}] database ?",
+        "drop_database_ask": "Are you sure you want to drop the database",
+        "drop_database_ask_message": "The process of DROPPING the database [{database}] is irreversible, Do you want to procceed?",
+        "database_created": "Database created",
+        "database_created_message": "Database has been created successfully",
+        "database_deleted": "Database deleted",
+        "database_deleted_message": "The database has been deleted successfully"
     }
 }
