@@ -44,6 +44,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from '@/stores/store';
 import LoadingPlugin from "@/services/loading";
+import TranslationPlugin from "@/services/translationservice";
 
 const app = createApp(App);
 
@@ -90,5 +91,9 @@ app.use(ToastService);
 app.use(ConfirmationService);
 
 app.use(LoadingPlugin);
+app.use(TranslationPlugin, {
+    defaultLanguage: 'english',
+    supportedLanguages: ['english', 'arabic']
+});
 
 app.mount("#app");

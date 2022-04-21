@@ -50,7 +50,10 @@ export default {
                 "vela-purple"
             ],
 
-            theme: ''
+            settings: true,
+
+            theme: '',
+            language: ''
         }
     },
 
@@ -72,6 +75,10 @@ export default {
             document.getElementById(this.theme).rel = 'stylesheet';
 
             localStorage.setItem('theme', this.theme);
+        },
+
+        async SelectLanguage() {
+            this.$translation.load(this.language);
         }
     },
 
@@ -108,16 +115,16 @@ export default {
         <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
             <div class="flex align-items-center">
                 <img alt="logo" src="@/assets/logo2.png" height="34" class="cursor-pointer" @click="Home">
-                <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" label="Home" @click="Home" />
+                <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" :label="$translate('general.home')" @click="Home" />
             </div>
 
             <div class="flex align-items-center">
                 <div>
                     <span class="pi pi-moon text-primary px-2"></span>
-                    <Dropdown placeholder="Theme" class="cursor-pointer theme-selector" v-model="theme" :options="themes" @change="SelectTheme" />
+                    <Dropdown :placeholder="$translate('general.themes')" class="cursor-pointer theme-selector" v-model="theme" :options="themes" @change="SelectTheme" />
                 </div>
 
-                <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" label="Logout" @click="Logout" />
+                <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" :label="$translate('general.logout')" @click="Logout" />
             </div>
         </div>
     </header>
@@ -125,6 +132,20 @@ export default {
     <div>
         <RouterView />
     </div>
+
+    <Dialog class="settings-dialog" :header="$translate('general.settings')" v-model:visible="settings" :modal="true">
+        <div>
+            <div>
+                <p class="my-1">{{ $translate('general.themes') }}</p>
+                <Dropdown :placeholder="$translate('general.themes')" class="w-full" v-model="theme" :options="themes" @change="SelectTheme" />
+            </div>
+
+            <div class="mt-5">
+                <p class="mb-1">{{ $translate('general.language') }}</p>
+                <Dropdown :placeholder="$translate('general.language')" class="w-full" v-model="language" :options="$translation.supportedLanguages" @change="SelectLanguage" />
+            </div>
+        </div>
+    </Dialog>
 </template>
 
 <style>
@@ -135,9 +156,9 @@ body {
     color: var(--text-color);
 }
 
-.theme-selector {
-    max-width: 100%;
-    width: 200px;
+.settings-dialog {
+    width: 400px;
+    max-width: 90vw;
 }
 
 #db-weiv-loading-module {

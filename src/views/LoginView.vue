@@ -18,7 +18,7 @@ export default {
                 displayName: ''
             },
             moreOptions: {
-                text: 'More Options',
+                text: this.$translate('general.moreOptions'),
                 icon: 'pi pi-angle-down',
                 active: false
             },
@@ -69,10 +69,10 @@ export default {
             this.moreOptions.active = !this.moreOptions.active
             if (this.moreOptions.active) {
                 this.moreOptions.icon = 'pi pi-angle-up'
-                this.moreOptions.text = 'Less Options'
+                this.moreOptions.text = this.$translate('general.lessOptions')
             } else {
                 this.moreOptions.icon = 'pi pi-angle-down'
-                this.moreOptions.text = 'More Options'
+                this.moreOptions.text = this.$translate('general.moreOptions')
             }
         },
 
@@ -132,7 +132,7 @@ export default {
         <div class="loginData-card loginData-margin mx-auto surface-card p-4 shadow-2 border-round">
             <div class="text-center mb-5">
                 <img src="@/assets/logo2.png" alt="DB Weiv" width="50" class="mb-3">
-                <div class="text-900 text-3xl font-medium mb-3">Login</div>
+                <div class="text-900 text-3xl font-medium mb-3">{{ $translate('login.title') }}</div>
             </div>
 
             <InlineMessage severity="error" v-if="error" class="mb-3 w-full scalein">
@@ -145,7 +145,7 @@ export default {
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-user"></i>
                         </span>
-                        <InputText placeholder="Username" v-model="loginData.username" />
+                        <InputText :placeholder="$translate('login.username')" v-model="loginData.username" />
                     </div>
                 </div>
 
@@ -154,7 +154,7 @@ export default {
                         <span class="p-inputgroup-addon">
                             <i class="pi pi-lock"></i>
                         </span>
-                        <Password placeholder="Password" v-model="loginData.password" toggle-mask :feedback="false" />
+                        <Password :placeholder="$translate('login.password')" v-model="loginData.password" toggle-mask :feedback="false" />
                     </div>
                 </div>
 
@@ -164,8 +164,8 @@ export default {
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-server"></i>
                             </span>
-                            <InputText placeholder="Host" v-model="loginData.host"
-                                v-tooltip.right="'Defaults to: localhost'" />
+                            <InputText :placeholder="$translate('login.host')" v-model="loginData.host"
+                                v-tooltip.right="$translate('login.defaultsTo') + ': localhost'" />
                         </div>
                     </div>
 
@@ -174,18 +174,18 @@ export default {
                             <span class="p-inputgroup-addon">
                                 <i class="pi pi-sort-alt"></i>
                             </span>
-                            <InputNumber placeholder="Port" v-model="loginData.port" mode="decimal" :use-grouping="false"
-                                v-tooltip.right="'Defaults to: 3306'" />
+                            <InputNumber :placeholder="$translate('login.port')" v-model="loginData.port" mode="decimal" :use-grouping="false"
+                                v-tooltip.right="$translate('login.defaultsTo') + ': 3306'" />
                         </div>
                     </div>
                 </div>
 
                 <div class="text-center mt-3">
-                    <Button label="Login" class="login-button" @click="Login" />
+                    <Button :label="$translate('login.login')" class="login-button" @click="Login" />
                     
                     <div class="flex justify-content-between">
                         <Button
-                            label="Save Account"
+                            :label="$translate('login.saveAccount')"
                             class="p-button-text p-button-plain"
                             @click="displayNameDialog = true"
                         />
@@ -203,7 +203,7 @@ export default {
 
         <div class="loginData-card mx-auto surface-card pt-3 shadow-2 border-round mt-3">
             <div class="text-center">
-                <div class="text-600 text-2xl font-medium">Saved Accounts</div>
+                <div class="text-600 text-2xl font-medium">{{ $translate('login.savedAccounts') }}</div>
             </div>
 
             <div class="px-5">
@@ -221,50 +221,53 @@ export default {
                 />
 
                 <div class="text-center text-600 mb-3" v-if="savedAccounts.length == 0">
-                    There are no saved accounts.
+                    {{ $translate('login.noSavedAccounts') }}
                 </div>
             </div>
         </div>
 
-        <Dialog header="Save account" v-model:visible="displayNameDialog" class="display-name-dialog" :modal="true">
+        <Dialog :header="$translate('login.saveAccount')" v-model:visible="displayNameDialog" class="display-name-dialog" :modal="true">
             <div>
-                <InputText placeholder="Display Name" v-model="loginData.displayName" class="w-full mt-3" />
+                <InputText :placeholder="$translate('login.displayName')" v-model="loginData.displayName" class="w-full mt-3" />
             </div>
 
             <div class="mt-3">
                 <Checkbox v-model="savePassword" :binary="true" class="mr-1" />
-                Save Password Too ?
+                {{ $translate('login.savePassword') }} ?
             </div>
 
             <div class="p-text-secondary" v-if="savePassword">
-                <p class="mb-0"><b>Note</b>: storing passwords is generally not recommended, if you choose not to, you'll be prompt to enter the password on subsequent logins !</p>
+                <p class="mb-0">
+                    
+                    <b>{{ $translate('login.passwordNote') }}</b>: {{ $translate('login.passwordNoteText') }}
+                </p>
             </div>
 
             <template #footer>
                 <div class="flex justify-content-between">
                     <Button
-                        label="Cancel"
+                        :label="$translate('general.cancel')"
                         @click="displayNameDialog = false"
                         class="p-button-text"
                     />
-                    <Button label="Save" @click="SaveAccount" />
+                    <Button :label="$translate('general.save')" @click="SaveAccount" />
                 </div>
             </template>
         </Dialog>
 
-        <Dialog header="Type the password" v-model:visible="selectedAccount" class="display-name-dialog" :modal="true">
+        <Dialog :header="$translate('login.typePassword')" v-model:visible="selectedAccount" class="display-name-dialog" :modal="true">
             <div class="p-text-secondary">
-                <InputText type="password" placeholder="Password" v-model="selectedAccountPassword" class="w-full mt-3" />
+                <InputText type="password" :placeholder="$translate('login.password')" v-model="selectedAccountPassword" class="w-full mt-3" />
             </div>
 
             <template #footer>
                 <div class="flex justify-content-between">
                     <Button
-                        label="Cancel"
+                        :label="$translate('general.cancel')"
                         @click="selectedAccount = false"
                         class="p-button-text"
                     />
-                    <Button label="Login" @click="LoadAccount" />
+                    <Button :label="$translate('login.login')" @click="LoadAccount" />
                 </div>
             </template>
         </Dialog>
