@@ -44,7 +44,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from '@/stores/store';
 import LoadingPlugin from "@/services/loading";
-import TranslationPlugin from "@/services/translationservice";
+import { createI18n } from 'vue-i18n/index'
 
 const app = createApp(App);
 
@@ -91,9 +91,16 @@ app.use(ToastService);
 app.use(ConfirmationService);
 
 app.use(LoadingPlugin);
-app.use(TranslationPlugin, {
-    defaultLanguage: 'english',
-    supportedLanguages: ['english', 'arabic']
-});
+
+const i18n = createI18n({
+    locale: 'English',
+    messages: {
+        'English': require('@/locales/en.json'),
+        'العربية': require('@/locales/ar.json'),
+    }
+})
+
+app.use(i18n)
+
 
 app.mount("#app");

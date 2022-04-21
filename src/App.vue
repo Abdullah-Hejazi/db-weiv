@@ -50,7 +50,7 @@ export default {
                 "vela-purple"
             ],
 
-            settings: true,
+            settings: false,
 
             theme: '',
             language: ''
@@ -67,6 +67,13 @@ export default {
             this.$router.push('/databases')
         },
 
+        FinishSettings () {
+            this.SelectTheme();
+            this.SelectLanguage();
+
+            this.settings = false
+        },
+
         async SelectTheme() {
             this.themes.forEach(theme => {
                 document.getElementById(theme).rel = '';
@@ -77,12 +84,23 @@ export default {
             localStorage.setItem('theme', this.theme);
         },
 
-        async SelectLanguage() {
-            this.$translation.load(this.language);
+        SelectLanguage() {
+            if (this.language) {
+                this.$i18n.locale = this.language;
+                localStorage.setItem('language', this.language);
+            }
         }
     },
 
     created() {
+        // load language
+        let language = localStorage.getItem('language')
+
+        if (language) {
+            this.language = localStorage.getItem('language');
+            this.SelectLanguage()
+        }
+
         this.themes.forEach(theme => {
             let link = document.createElement('link');
             link.rel = "";
@@ -104,48 +122,47 @@ export default {
 </script>
 
 <template>
-    <ConfirmDialog />
-    <Toast />
+    <div>
+        <ConfirmDialog />
+        <Toast />
 
-    <p id="db-weiv-loading-module">
-        <ProgressSpinner strokeWidth="3" class="db-weiv-loading-module-spinner" />
-    </p>
+        <p id="db-weiv-loading-module">
+            <ProgressSpinner strokeWidth="3" class="db-weiv-loading-module-spinner" />
+        </p>
 
-    <header>
-        <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
-            <div class="flex align-items-center">
-                <img alt="logo" src="@/assets/logo2.png" height="34" class="cursor-pointer" @click="Home">
-                <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" :label="$translate('general.home')" @click="Home" />
-            </div>
-
-            <div class="flex align-items-center">
-                <div>
-                    <span class="pi pi-moon text-primary px-2"></span>
-                    <Dropdown :placeholder="$translate('general.themes')" class="cursor-pointer theme-selector" v-model="theme" :options="themes" @change="SelectTheme" />
+        <header>
+            <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
+                <div class="flex align-items-center">
+                    <img alt="logo" src="@/assets/logo2.png" height="34" class="cursor-pointer" @click="Home">
+                    <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" :label="$t('general.home')" @click="Home" />
                 </div>
 
-                <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" :label="$translate('general.logout')" @click="Logout" />
+                <div class="flex align-items-center">
+                    <Button icon="pi pi-cog" class="p-button-plain p-button-text ml-3" :label="$t('general.settings')" @click="settings = true" />
+
+                    <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" :label="$t('general.logout')" @click="Logout" />
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <div>
-        <RouterView />
-    </div>
-
-    <Dialog class="settings-dialog" :header="$translate('general.settings')" v-model:visible="settings" :modal="true">
         <div>
-            <div>
-                <p class="my-1">{{ $translate('general.themes') }}</p>
-                <Dropdown :placeholder="$translate('general.themes')" class="w-full" v-model="theme" :options="themes" @change="SelectTheme" />
-            </div>
-
-            <div class="mt-5">
-                <p class="mb-1">{{ $translate('general.language') }}</p>
-                <Dropdown :placeholder="$translate('general.language')" class="w-full" v-model="language" :options="$translation.supportedLanguages" @change="SelectLanguage" />
-            </div>
+            <RouterView />
         </div>
-    </Dialog>
+
+        <Dialog class="settings-dialog" :header="$t('general.settings')" v-model:visible="settings" :modal="true">
+            <div>
+                <div>
+                    <p class="my-1">{{ $t('general.themes') }}</p>
+                    <Dropdown :placeholder="$t('general.themes')" class="w-full" v-model="theme" :options="themes" @change="SelectTheme" />
+                </div>
+
+                <div class="mt-5">
+                    <p class="mb-1">{{ $t('general.language') }}</p>
+                    <Dropdown :placeholder="$t('general.language')" class="w-full" v-model="language" :options="$i18n.availableLocales" @change="SelectLanguage" />
+                </div>
+            </div>
+        </Dialog>
+    </div>
 </template>
 
 <style>
