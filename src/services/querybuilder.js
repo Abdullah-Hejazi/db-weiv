@@ -162,7 +162,17 @@ class QueryBuilder {
                 vals = value
             }
 
-            value = '(' + vals.map(item => `'${item.trim()}'`).join(',') + ')';
+            value = '(';
+
+            value += vals.map(item => {
+                if (typeof item == 'string') {
+                    return `'${item.trim()}'`;
+                }
+
+                return `'${item}'`
+            }).join(',')
+
+            value += ')';
         }
 
         this.wheres.push({

@@ -38,6 +38,7 @@ import ScrollTop from 'primevue/scrolltop';
 import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar';
 import ContextMenu from 'primevue/contextmenu';
+import FileUpload from 'primevue/fileupload';
 
 
 import App from "./App.vue";
@@ -84,6 +85,7 @@ app.component('ScrollTop', ScrollTop);
 app.component('Textarea', Textarea);
 app.component('Calendar', Calendar);
 app.component('ContextMenu', ContextMenu);
+app.component('FileUpload', FileUpload);
 
 
 app.directive('Tooltip', Tooltip);

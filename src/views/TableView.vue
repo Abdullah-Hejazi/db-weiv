@@ -38,6 +38,11 @@ export default {
 
             menuItems: [
                 {
+                    label: 'Refresh Table',
+                    icon: 'pi pi-refresh',
+                    command: this.LoadTable
+                },
+                {
                     label: 'Insert Row',
                     icon: 'pi pi-plus',
                     command: () => this.newRow.active = true

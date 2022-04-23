@@ -1,7 +1,10 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
+import { app, protocol, BrowserWindow, Menu, Tray, dialog } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+
+const ipcMain = require('electron').ipcMain;
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 
@@ -23,7 +26,7 @@ function createWindow() {
 
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-            nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+            nodeIntegration: true,
             contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
         }
     })
@@ -99,6 +102,22 @@ app.whenReady().then(() => {
 
     appIcon.setContextMenu(contextMenu)
 })
+
+// open dialog
+ipcMain.on('open-file', function (event, path) {
+    let result = dialog.showOpenDialogSync({
+        browserWindow: win,
+        properties: ['openFile'],
+        filters: [
+            {
+                name: 'Sql File',
+                extensions: ['sql']
+            }
+        ]
+    });
+
+    event.returnValue = result
+});
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

@@ -91,7 +91,7 @@ export default {
                     <img src="@/assets/db.png" height="80">
                 </div>
 
-                <div class="text-lg text-white db-title text-overflow-ellipsis mx-auto">{{ database.SCHEMA_NAME }}</div>
+                <div class="text-lg text-white db-title overflow-ellipsis mx-auto">{{ database.SCHEMA_NAME }}</div>
             </div>
         </div>
 

@@ -47,5 +47,12 @@
         "database_created_message": "Database has been created successfully",
         "database_deleted": "Database deleted",
         "database_deleted_message": "The database has been deleted successfully"
+    },
+
+    "import": {
+        "import_database": "Import Database",
+        "import": "Import",
+        "select_file": "Select the file",
+        "selected_file": "Selected file"
     }
 }

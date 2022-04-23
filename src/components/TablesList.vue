@@ -1,13 +1,15 @@
 <script>
 
 import CreateTableDialog from '@/components/CreateTableDialog'
+import ImportDialog from '@/components/ImportDialog.vue'
 
 export default {
     name: 'TablesList',
 
     components: {
-        CreateTableDialog
-    },
+    CreateTableDialog,
+    ImportDialog
+},
 
     data() {
         return {
@@ -37,12 +39,13 @@ export default {
                             icon: 'pi pi-hashtag'
                         },
                         {
-                            label: 'Export',
-                            icon: 'pi pi-download'
+                            label: 'Import',
+                            icon: 'pi pi-upload',
+                            command: () => this.importDialog = true
                         },
                         {
-                            label: 'Import',
-                            icon: 'pi pi-upload'
+                            label: 'Export',
+                            icon: 'pi pi-download'
                         },
                         {
                             label: 'Settings',
@@ -52,7 +55,8 @@ export default {
                 }
             ],
 
-            createTableDialog: false
+            createTableDialog: false,
+            importDialog: true
         }
     },
 
@@ -88,6 +92,10 @@ export default {
             table.selected = true
 
             this.load(table.label)
+        },
+
+        async ImportData() {
+            
         }
     }
 }
@@ -123,6 +131,8 @@ export default {
         <Dialog class="create-table-modal" header="Create Table" v-model:visible="createTableDialog" :modal="true">
             <CreateTableDialog :finish="FinishTableCreation" :engines="engines" />
         </Dialog>
+
+        <ImportDialog :visible="importDialog" @visibilityChange="val => importDialog = val" />
     </div>
 </template>
 
