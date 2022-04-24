@@ -187,7 +187,7 @@ body {
     margin: 0px;
     padding: 0px;
     background-color: rgba(0, 0, 0, 0.493);
-    z-index: 2500;
+    z-index: 9999;
     display: none;
 }
 

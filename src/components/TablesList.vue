@@ -56,7 +56,7 @@ export default {
             ],
 
             createTableDialog: false,
-            importDialog: true
+            importDialog: false
         }
     },
 

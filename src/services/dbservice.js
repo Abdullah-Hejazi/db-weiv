@@ -27,6 +27,10 @@ export default {
         return pool.query(query, parameters)
     },
 
+    bulkQuery: (query) => {
+        return pool.query(query)
+    },
+
     endConnection: () => {
         pool?.end();
         pool = null;

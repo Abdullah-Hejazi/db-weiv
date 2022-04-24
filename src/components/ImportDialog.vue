@@ -1,19 +1,26 @@
 <script>
 
 const { ipcRenderer } = require('electron')
+import SqlFileService from '@/services/sqlfileservice'
+import DBService from '@/services/dbservice'
 
 export default {
     name: 'ImportDialog',
 
     props: [
-        'visible'
+        'visible',
+        'database'
     ],
 
     data () {
         return {
-            active: true,
+            active: false,
             sqlFile: ''
         }
+    },
+
+    mounted () {
+        this.active = this.visible
     },
 
     methods: {
@@ -28,7 +35,22 @@ export default {
         },
 
         ImportFile () {
-            console.log('here')
+            let queries = new SqlFileService().import(this.sqlFile);
+
+            if (! queries?.data) {
+                return;
+            }
+
+            queries.data.unshift('USE ' + this.$route.params.database)
+
+            this.$loading.show()
+
+            DBService.bulkQuery(queries.data.join(';')).finally(() => {
+                this.$loading.hide()
+                console.log('finished')
+                this.$emit('visibilityChange', false)
+            })
+
         }
     },
 
