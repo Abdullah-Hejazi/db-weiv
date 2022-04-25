@@ -16,6 +16,10 @@ export default {
             if (column.Field === this.data.field) {
                 let t = column.Type;
                 this.type = t
+
+                if (column.Null == 'YES') {
+                    this.nullable = true;
+                }
             }
         })
 
@@ -55,7 +59,8 @@ export default {
                 enums: ['ENUM', 'SET']
             },
             type: '',
-            isNull: false
+            isNull: false,
+            nullable: false
         }
     },
 
@@ -130,7 +135,7 @@ export default {
             <InputText :placeholder="data.field" v-model="newValue" class="w-full" />
         </div>
 
-        <div>
+        <div v-if="nullable">
             <Checkbox @change="newValue = null" v-model="isNull" :binary="true" class="mr-2 mt-2" />
             <span>{{ $t('table.is_null') }}</span>
         </div>
