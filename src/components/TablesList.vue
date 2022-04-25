@@ -48,15 +48,19 @@ export default {
                             icon: 'pi pi-download'
                         },
                         {
-                            label: 'Settings',
-                            icon: 'pi pi-cog'
+                            label: 'Drop Database',
+                            icon: 'pi pi-trash',
+                            command: () => this.deleteDatabaseDialog = true
                         }
                     ]
                 }
             ],
 
             createTableDialog: false,
-            importDialog: false
+            importDialog: false,
+
+
+            deleteDatabaseDialog: false
         }
     },
 
@@ -96,7 +100,45 @@ export default {
 
         async ImportData() {
             
-        }
+        },
+
+        DeleteDatabaseDoubleCheck() {
+            this.deleteDatabaseDialog = false
+            this.$confirm.require({
+                header: this.$t('home.drop_database_ask'),
+                message: this.$t('home.drop_database_ask_message', { database: this.$route.params.database }),
+                icon: 'pi pi-exclamation-triangle',
+                acceptClass: 'p-button-danger',
+                rejectClass: 'p-button-plain p-button-text',
+                autofocus: false,
+                acceptLabel: this.$t('general.delete'),
+                rejectLabel: this.$t('general.cancel'),
+                accept: () => {
+                    this.DeleteDatabase()
+                }
+            });
+        },
+
+        async DeleteDatabase() {
+            this.$loading.show()
+
+            this.$store.dispatch('database/dropDatabase', this.$route.params.database).then((result) => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: this.$t('home.database_deleted'),
+                        detail: this.$t('home.database_deleted_message'),
+                        life: 3000
+                    });
+
+                    this.$router.push('/databases')
+                } else {
+                    this.error = result.error;
+                }
+            }).finally(() => {
+                this.$loading.hide()
+            })
+        },
     }
 }
 </script>
@@ -133,6 +175,18 @@ export default {
         </Dialog>
 
         <ImportDialog :visible="importDialog" @visibilityChange="val => importDialog = val" />
+
+
+        <Dialog :draggable="false" :modal="true" :header="$t('home.drop_database_confirm')" class="db-dialog" v-model:visible="deleteDatabaseDialog" >
+            <InlineMessage severity="error" class="mb-3 w-full">
+                {{ $t('home.drop_database_confirm_message', {database: $route.params.database}) }}
+            </InlineMessage>
+
+            <template #footer>
+                <Button :label="$t('general.cancel')" @click="deleteDatabaseDialog = false" class="p-button-text p-button-plain" />
+                <Button :label="$t('general.delete')" @click="DeleteDatabaseDoubleCheck" class="p-button-danger" />
+            </template>
+        </Dialog>
     </div>
 </template>
 

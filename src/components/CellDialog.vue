@@ -54,7 +54,8 @@ export default {
                 times: ["TIME"],
                 enums: ['ENUM', 'SET']
             },
-            type: ''
+            type: '',
+            isNull: false
         }
     },
 
@@ -127,6 +128,11 @@ export default {
 
         <div v-else>
             <InputText :placeholder="data.field" v-model="newValue" class="w-full" />
+        </div>
+
+        <div>
+            <Checkbox @change="newValue = null" v-model="isNull" :binary="true" class="mr-2 mt-2" />
+            <span>{{ $t('table.is_null') }}</span>
         </div>
 
         <div class="mt-5">

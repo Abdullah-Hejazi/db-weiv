@@ -49,6 +49,10 @@
         "database_deleted_message": "The database has been deleted successfully"
     },
 
+    "table": {
+        "is_null": "Null"
+    },
+
     "import": {
         "import_database": "Import Database",
         "import": "Import",

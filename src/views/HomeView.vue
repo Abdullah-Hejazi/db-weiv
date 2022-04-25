@@ -73,28 +73,7 @@ export default {
             }).finally(() => {
                 this.$loading.hide()
             })
-        },
-
-        async DeleteDatabase(database) {
-            this.$loading.show()
-
-            this.$store.dispatch('database/dropDatabase', database.SCHEMA_NAME).then((result) => {
-                if (result.success) {
-                    this.$toast.add({
-                        severity:'success',
-                        summary: this.$t('home.database_deleted'),
-                        detail: this.$t('home.database_deleted_message'),
-                        life: 3000
-                    });
-
-                    this.RefreshDatabase()
-                } else {
-                    this.error = result.error;
-                }
-            }).finally(() => {
-                this.$loading.hide()
-            })
-        },
+        }
     }
 }
 
@@ -135,7 +114,6 @@ export default {
                 :key="index"
                 :index="index"
                 :database="database"
-                :delete="DeleteDatabase"
             />
         </div>
 
