@@ -65,6 +65,9 @@ export default {
         left: 0px;
         width: 100%;
         -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .drag-bar {
