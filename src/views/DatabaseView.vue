@@ -13,18 +13,6 @@ export default {
 
     data() {
         return {
-            items: [
-                {
-                    label: 'DatabaseName'
-                }
-            ],
-
-            home: {
-                icon: 'pi pi-server',
-                to: '/databases',
-                label: ' ' + this.$store.state.database.data.host
-            },
-
             error: '',
 
             tables: [],
@@ -77,23 +65,17 @@ export default {
         },
 
         LoadTable(name) {
-            this.items[1] = {
-                label: name
-            }
-
             this.table = name
         },
 
         DeleteTable() {
             this.table = ''
-            this.items.splice(1, 1);
             this.RefreshTables()
         }
     },
 
     mounted () {
         this.database = this.$route.params.database
-        this.items[0].label = this.database
 
         this.RefreshTables()
     },
@@ -143,8 +125,6 @@ export default {
 
 <template>
     <div class="tables">
-        <Breadcrumb :home="home" :model="items" :exact="false" />
-
         <div v-if="error" class="mx-5 mt-5">
             <InlineMessage severity="error" class="w-full scalein select-text">
                 {{ error }}
@@ -172,11 +152,11 @@ export default {
 
 <style>
 .scroll-menu {
-    height: calc(100vh - 280px);
+    height: calc(100vh - 190px);
 }
 
 .scroll-menu2 {
-    height: calc(100vh - 358px);
+    height: calc(100vh - 268px);
 }
 
 </style>

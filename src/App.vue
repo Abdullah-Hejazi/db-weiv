@@ -1,4 +1,7 @@
 <script>
+
+import TitleBar from '@/components/TitleBar'
+
 export default {
     name: 'DB Weiv - Database Viewer',
 
@@ -51,29 +54,18 @@ export default {
             ],
 
             settings: false,
+            about: false,
 
             theme: '',
             language: ''
         }
     },
 
+    components: {
+        TitleBar
+    },
+
     methods: {
-        Logout() {
-            this.$store.dispatch('database/clearConnection');
-            this.$router.push('/');
-        },
-
-        Home () {
-            this.$router.push('/databases')
-        },
-
-        FinishSettings () {
-            this.SelectTheme();
-            this.SelectLanguage();
-
-            this.settings = false
-        },
-
         async SelectTheme() {
             this.themes.forEach(theme => {
                 document.getElementById(theme).rel = '';
@@ -89,6 +81,10 @@ export default {
                 this.$i18n.locale = this.language;
                 localStorage.setItem('language', this.language);
             }
+        },
+
+        OpenSettings() {
+            this.settings = true
         }
     },
 
@@ -126,28 +122,18 @@ export default {
         <ConfirmDialog />
         <Toast />
 
+        <TitleBar :settings="OpenSettings" :about="() => about = true" />
+
+
         <p id="db-weiv-loading-module">
             <ProgressSpinner strokeWidth="3" class="db-weiv-loading-module-spinner" />
         </p>
 
-        <header>
-            <div class="border-round mb-3 p-3 surface-card shadow-4 flex justify-content-between">
-                <div class="flex align-items-center">
-                    <img alt="logo" src="@/assets/logo2.png" height="34" class="cursor-pointer" @click="Home">
-                    <Button v-if="$store.state.database.connected" icon="pi pi-home" class="ml-3 p-button-text p-button-plain" :label="$t('general.home')" @click="Home" />
-                </div>
-
-                <div class="flex align-items-center">
-                    <Button icon="pi pi-cog" class="p-button-plain p-button-text ml-3" :label="$t('general.settings')" @click="settings = true" />
-
-                    <Button v-if="$store.state.database.connected" icon="pi pi-power-off" class="p-button-plain p-button-text ml-3" :label="$t('general.logout')" @click="Logout" />
-                </div>
+        <ScrollPanel class="scrollbar-themed">
+            <div>
+                <RouterView />
             </div>
-        </header>
-
-        <div>
-            <RouterView />
-        </div>
+        </ScrollPanel>
 
         <Dialog class="settings-dialog" :header="$t('general.settings')" v-model:visible="settings" :modal="true">
             <div>
@@ -159,6 +145,31 @@ export default {
                 <div class="mt-5">
                     <p class="mb-1">{{ $t('general.language') }}</p>
                     <Dropdown :placeholder="$t('general.language')" class="w-full" v-model="language" :options="$i18n.availableLocales" @change="SelectLanguage" />
+                </div>
+            </div>
+        </Dialog>
+
+        <Dialog class="settings-dialog" :header="$t('general.about') + ' DB Weiv'" v-model:visible="about" :modal="true">
+            <div>
+                <div class="mb-5">
+                    DB Weiv, is a database viewer and editor for developers.
+                </div>
+                <div>
+                    Developed with love by <a class="text-primary" href="https://twitter.com/AbdullahHejazi6" target="_blank">Abdullah Hejazi</a>
+                </div>
+
+                <div class="flex justify-content-center mt-5">
+                    <a href="https://twitter.com/AbdullahHejazi6" target="_blank" class="text-primary mx-3">
+                        <span class="pi pi-twitter text-3xl"></span>
+                    </a>
+
+                    <a href="https://github.com/Abdullah-Hejazi" target="_blank" class="text-primary mx-3">
+                        <span class="pi pi-github text-3xl"></span>
+                    </a>
+
+                    <a href="https://www.facebook.com/a.m.a.hejazi/" target="_blank" class="text-primary mx-3">
+                        <span class="pi pi-facebook text-3xl"></span>
+                    </a>
                 </div>
             </div>
         </Dialog>
@@ -182,8 +193,8 @@ body {
     position: fixed;
     width: 100vw;
     height: 100vh;
-    top: 0px;
-    left: 0px;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
     margin: 0px;
     padding: 0px;
     background-color: rgba(0, 0, 0, 0.493);
@@ -195,4 +206,12 @@ body {
     margin-top: calc(50vh - 50px);
     margin-left: calc(50vw - 50px);
 }
+
+
+.scrollbar-themed {
+    margin-top: 55px;
+    width: 100%;
+    height: calc(100vh - 63px);
+}
+
 </style>

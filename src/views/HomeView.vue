@@ -15,14 +15,6 @@ export default {
                 collation: this.$store.state.database.collations[122],
             },
 
-            items: [],
-
-            home: {
-                icon: 'pi pi-server',
-                to: '/databases',
-                label: ' ' + this.$store.state.database.data?.host
-            },
-
             newDBError: '',
             error: '',
 
@@ -64,8 +56,6 @@ export default {
             this.error = ''
             this.$loading.show()
 
-            this.home.label = ' ' + this.$store.state.database.data?.host
-
             this.$store.dispatch('database/refreshDatabases').then((result) => {
                 if (! result.success) {
                     this.error = result.error;
@@ -81,8 +71,6 @@ export default {
 
 <template>
     <div class="databases">
-        <Breadcrumb :home="home" :model="items" />
-
         <div class="text-center text-2xl my-3">
             <div>{{ $t('home.databases') }}</div>
             <div class="flex justify-content-center align-items-center mt-1">

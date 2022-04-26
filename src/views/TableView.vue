@@ -435,7 +435,7 @@ export default {
             </template>
 
             <template #icons>
-                <Button class="p-button-text p-button-rounded" icon="pi pi-cog" @click="OpenTableMenu"  />
+                <Button class="p-button-text p-button-rounded p-0" icon="pi pi-cog" @click="OpenTableMenu"  />
                 <Menu ref="tableMenu" :model="menuItems" :popup="true" />
                 <Button
                     @click="ClearSearch"

@@ -20,6 +20,9 @@ function createWindow() {
     win = new BrowserWindow({
         width: 800,
         height: 600,
+        minWidth: 800,
+        minHeight: 600,
+        frame: false,
         icon: __dirname + '/favicon.ico',
         title: 'DB Weiv - Database Viewer',
         webPreferences: {
@@ -50,6 +53,10 @@ function createWindow() {
         }
     
         return false;
+    });
+
+    win.webContents.setWindowOpenHandler(function(e) {
+        require('electron').shell.openExternal(e.url);
     });
 }
 
@@ -117,6 +124,22 @@ ipcMain.on('open-file', function (event, path) {
     });
 
     event.returnValue = result
+});
+
+ipcMain.on('minimize-app', function (event, path) {
+    win.minimize();
+});
+
+ipcMain.on('maximize-app', function (event, path) {
+    if (win.isMaximized()) {
+        win.unmaximize();
+    } else {
+        win.maximize();
+    }
+});
+
+ipcMain.on('close-app', function (event, path) {
+    win.close();
 });
 
 // Exit cleanly on request from parent process in development mode.
