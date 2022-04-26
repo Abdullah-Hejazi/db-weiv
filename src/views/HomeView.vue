@@ -132,6 +132,7 @@ export default {
                     optionLabel="COLLATION_NAME"
                     :placeholder="$t('home.select_collation')"
                     option-group-children="items"
+                    :filter="true"
                 />
             </div>
 

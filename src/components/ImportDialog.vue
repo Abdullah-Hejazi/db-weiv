@@ -43,7 +43,9 @@ export default {
 
             queries.data.unshift('USE ' + this.$route.params.database)
 
-            this.$loading.show()
+            // this.$loading.show()
+            console.log(queries.data)
+            return;
 
             DBService.bulkQuery(queries.data.join(';')).finally(() => {
                 this.$loading.hide()
