@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "description": "A Database viewer for desktop",
     "author": "Abdullah Hejazi",
+    "icon": "favicon.ico",
     "scripts": {
         "build": "vite build",
         "test:unit": "vitest --environment jsdom",
