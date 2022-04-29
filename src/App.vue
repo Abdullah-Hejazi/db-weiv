@@ -198,13 +198,15 @@ body {
     margin: 0px;
     padding: 0px;
     background-color: rgba(0, 0, 0, 0.493);
-    z-index: 9999;
+    z-index: 9998;
     display: none;
 }
 
 .db-weiv-loading-module-spinner {
-    margin-top: calc(50vh - 50px);
-    margin-left: calc(50vw - 50px);
+    position: fixed;
+    z-index: 9999;
+    top: calc(50vh - 50px);
+    left: calc(50vw - 50px);
 }
 
 
