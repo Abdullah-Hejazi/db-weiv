@@ -193,8 +193,8 @@ body {
     position: fixed;
     width: 100vw;
     height: 100vh;
-    top: calc(50% - 50px);
-    left: calc(50% - 50px);
+    top: 55px;
+    left: 0px;
     margin: 0px;
     padding: 0px;
     background-color: rgba(0, 0, 0, 0.493);
