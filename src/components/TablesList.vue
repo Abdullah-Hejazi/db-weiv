@@ -2,14 +2,16 @@
 
 import CreateTableDialog from '@/components/CreateTableDialog'
 import ImportDialog from '@/components/ImportDialog.vue'
+import ExportDialog from '@/components/ExportDialog.vue'
 
 export default {
     name: 'TablesList',
 
     components: {
-    CreateTableDialog,
-    ImportDialog
-},
+        CreateTableDialog,
+        ImportDialog,
+        ExportDialog
+    },
 
     data() {
         return {
@@ -45,7 +47,8 @@ export default {
                         },
                         {
                             label: 'Export',
-                            icon: 'pi pi-download'
+                            icon: 'pi pi-download',
+                            command: () => this.exportDialog = true
                         },
                         {
                             label: 'Drop Database',
@@ -58,6 +61,7 @@ export default {
 
             createTableDialog: false,
             importDialog: false,
+            exportDialog: true,
 
 
             deleteDatabaseDialog: false
@@ -175,6 +179,8 @@ export default {
         </Dialog>
 
         <ImportDialog :visible="importDialog" @visibilityChange="val => importDialog = val" />
+
+        <ExportDialog :database="database" :visible="exportDialog" @visibilityChange="val => exportDialog = val" />
 
 
         <Dialog :draggable="false" :modal="true" :header="$t('home.drop_database_confirm')" class="db-dialog" v-model:visible="deleteDatabaseDialog" >

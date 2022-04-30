@@ -19,6 +19,23 @@ class SqlFileService {
         }
     }
 
+    export (file, content) {
+        const fileData = fs.readFileSync(file, 'utf8');
+
+        let data = this.parseFile(fileData)
+
+        if (data) {
+            return {
+                success: true,
+                data: data
+            }
+        }
+
+        return {
+            success: false
+        }
+    }
+
     parseFile(data) {
         data = this.removeComments(data).split(';');
 

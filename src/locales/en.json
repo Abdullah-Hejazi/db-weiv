@@ -59,5 +59,12 @@
         "import": "Import",
         "select_file": "Select the file",
         "selected_file": "Selected file"
+    },
+    
+    "export": {
+        "export_database": "Export Database",
+        "export": "Export",
+        "select_file": "Select the save file",
+        "selected_file": "Selected file"
     }
 }

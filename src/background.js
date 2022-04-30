@@ -22,7 +22,7 @@ function createWindow() {
         height: 600,
         minWidth: 800,
         minHeight: 600,
-        frame: false,
+        frame: process.env.WEBPACK_DEV_SERVER_URL,
         icon: __dirname + '/favicon.ico',
         title: 'DB Weiv - Database Viewer',
         webPreferences: {
@@ -125,6 +125,23 @@ ipcMain.on('open-file', function (event, path) {
 
     event.returnValue = result
 });
+
+// open save file dialog
+ipcMain.on('save-file', function (event, path) {
+    let result = dialog.showSaveDialogSync({
+        browserWindow: win,
+        properties: ['openFile'],
+        filters: [
+            {
+                name: 'Sql File',
+                extensions: ['sql']
+            }
+        ]
+    });
+
+    event.returnValue = result
+});
+
 
 ipcMain.on('minimize-app', function (event, path) {
     win.minimize();
