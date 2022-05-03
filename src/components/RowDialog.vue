@@ -7,7 +7,8 @@ export default {
         'finish',
         'tableStructure',
         'error',
-        'row'
+        'row',
+        'button'
     ],
 
     data () {
@@ -42,20 +43,39 @@ export default {
                 dates: ["DATE"],
                 times: ["TIME"],
                 enums: ['ENUM', 'SET']
-            },
-            button: 'Add Row'
+            }
         }
     },
 
     mounted () {
         if (this.row) {
-            this.button = 'Update Row'
             this.original = JSON.parse(JSON.stringify(this.row))
             this.data = JSON.parse(JSON.stringify(this.row))
+
+            // format dates to a proper format
+            this.tableStructure.forEach(column => {
+                if (this.TypeExists(this.types.dates, column.Type)) {
+                    this.data[column.Field] = this.FormatDate(this.data[column.Field])
+                }
+
+                else if (this.TypeExists(this.types.datetimes, column.Type)) {
+                    this.data[column.Field] = this.FormatDateTime(this.data[column.Field])
+                }
+            })
         }
     },
 
     methods: {
+        FormatDate(date) {
+            date = new Date(date)
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+        },
+
+        FormatDateTime(date) {
+            date = new Date(date)
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+        },
+
         TypeExists(haystack, needle) {
             needle = needle.toUpperCase();
     
@@ -63,7 +83,9 @@ export default {
                 return true;
             }
 
-            if (haystack.includes(needle.replace(/\(.*\)/, ''))) {
+            needle = needle.replace(/\(.*\)/, '').split(' ')[0]
+
+            if (haystack.includes(needle)) {
                 return true;
             }
 

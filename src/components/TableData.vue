@@ -31,6 +31,10 @@ export default {
 
             this.$refs.rowMenu.show(event.originalEvent);
         },
+
+        DuplicateRow(row) {
+            this.duplicateRow(row)
+        },
     },
 
     props : [
@@ -42,6 +46,7 @@ export default {
         'sortOrder',
         'hasKey',
         'editRow',
+        'duplicateRow',
         'deleteRow',
         'editCell'
     ],
@@ -58,6 +63,11 @@ export default {
                     command: () => this.EditRow(this.selectedRow)
                 },
                 {
+                    label: 'Duplicate',
+                    icon: 'pi pi-fw pi-copy',
+                    command: () => this.DuplicateRow(this.selectedRow)
+                },
+                {
                     label: 'Delete',
                     icon: 'pi pi-fw pi-times',
                     visible: this.hasKey,
@@ -70,11 +80,12 @@ export default {
     watch: {
         selectedRows: function(val) {
             this.menuModel[0].visible = this.hasKey && val.length < 2
+            this.menuModel[1].visible = val.length < 2
         },
 
         hasKey: function(val) {
             this.menuModel[0].visible = this.hasKey && this.selectedRows.length < 2
-            this.menuModel[1].visible = this.hasKey
+            this.menuModel[2].visible = this.hasKey
         }
     }
 }
@@ -119,7 +130,7 @@ export default {
             <Column :sortable="true" v-for="(col, index) of columns" :field="col.name" :header="col.name" :key="index" style="width: 100px;">
                 <template #body="slotProps">
                     <div class="row-data" v-on:dblclick="EditCell(slotProps)">
-                        {{ slotProps.data[slotProps.field] }}
+                        {{ slotProps.data[slotProps.field] }} &nbsp;
                     </div>
                 </template>
             </Column>
@@ -132,6 +143,8 @@ export default {
 <style>
 .row-data {
     max-width: 250px;
+    min-width: 40px;
+    height: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -107,6 +107,11 @@ export default {
                 data: null,
                 error: ''
             },
+            duplicateRow: {
+                active: false,
+                data: null,
+                error: ''
+            },
             editCell: {
                 active: false,
                 error: '',
@@ -293,10 +298,42 @@ export default {
             })
         },
 
+        async DuplicateRowExecute(row) {
+            this.$loading.show()
+            this.duplicateRow.error = ''
+
+            await this.$store.dispatch('database/insertRow', {
+                database: this.$route.params.database,
+                table: this.table,
+                row: row
+            }).then(result => {
+                if (result.success) {
+                    this.$toast.add({
+                        severity:'success',
+                        summary: 'Row duplicated',
+                        detail:'Row has been duplicated successfully',
+                        life: 3000
+                    });
+                    this.duplicateRow.active = false
+                } else {
+                    this.duplicateRow.error = result.error
+                }
+            }).finally(() => {
+                this.LoadTable()
+                this.$loading.hide()
+            })
+        },
+
         EditRow(row) {
             this.editRow.data = row;
             this.editRow.error = '';
             this.editRow.active = true;
+        },
+
+        DuplicateRow(row) {
+            this.duplicateRow.data = row;
+            this.duplicateRow.error = '';
+            this.duplicateRow.active = true;
         },
 
         async UpdateRow(row, original) {
@@ -461,6 +498,7 @@ export default {
                     :hasKey="tableKey !== ''"
                     :editRow="EditRow"
                     :deleteRow="DeleteRow"
+                    :duplicateRow="DuplicateRow"
                     :sortOrder="sortOrder"
                     :sortField="sort?.field"
                     :error="error"
@@ -519,11 +557,15 @@ export default {
         </Dialog>
 
         <Dialog header="Insert New Row" v-model:visible="newRow.active" class="add-row-dialog" :modal="true">
-            <RowDialog :error="newRow.error" :tableStructure="tableStructure" :finish="InsertRow" />
+            <RowDialog button="Insert Row" :error="newRow.error" :tableStructure="tableStructure" :finish="InsertRow" />
         </Dialog>
 
         <Dialog header="Edit Row" v-model:visible="editRow.active" class="add-row-dialog" :modal="true">
-            <RowDialog :row="editRow.data" :error="editRow.error" :tableStructure="tableStructure" :finish="UpdateRow" />
+            <RowDialog button="Edit Row" :row="editRow.data" :error="editRow.error" :tableStructure="tableStructure" :finish="UpdateRow" />
+        </Dialog>
+
+        <Dialog header="Duplicate Row" v-model:visible="duplicateRow.active" class="add-row-dialog" :modal="true">
+            <RowDialog button="Duplicate Row" :row="duplicateRow.data" :error="duplicateRow.error" :tableStructure="tableStructure" :finish="DuplicateRowExecute" />
         </Dialog>
 
         <Dialog :header="'Edit ' + editCell?.data?.field" v-model:visible="editCell.active" class="add-row-dialog" :modal="true">
