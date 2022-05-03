@@ -1,5 +1,6 @@
 <script>
 import DatabaseItem from '@/components/DatabaseItem';
+import DatabaseManager from '@/services/databasemanager';
 
 export default {
     name: 'HomeView',
@@ -30,7 +31,11 @@ export default {
         async CreateDatabase() {
             this.$loading.show()
 
-            this.$store.dispatch('database/createDatabase', this.newDatabase).then((result) => {
+            DatabaseManager.createDatabase(
+                this.newDatabase.name,
+                this.newDatabase.collation.CHARACTER_SET_NAME,
+                this.newDatabase.collation.COLLATION_NAME
+            ).then((result) => {
                 if (result.success) {
                     this.newDatabase.name = '';
                     this.createDatabaseDialog = false;

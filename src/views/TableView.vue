@@ -4,6 +4,8 @@ import TableData from '@/components/TableData.vue'
 import TableStructure from '@/components/TableStructure.vue'
 import RowDialog from '@/components/RowDialog.vue'
 import CellDialog from '@/components/CellDialog.vue'
+import ExportDialog from '@/components/ExportDialog.vue'
+
 
 export default {
     name: 'TableView',
@@ -12,7 +14,8 @@ export default {
         TableData,
         TableStructure,
         RowDialog,
-        CellDialog
+        CellDialog,
+        ExportDialog
     },
 
     data() {
@@ -54,6 +57,11 @@ export default {
                 },
                 {
                     separator: true
+                },
+                {
+                    label: this.$t('export.export'),
+                    icon: 'pi pi-download',
+                    command: () => this.exportDialog = true
                 },
                 {
                     label: 'Drop Table',
@@ -110,7 +118,8 @@ export default {
                 icon: 'pi pi-angle-down'
             },
             tableStructure: [],
-            tableKey: ''
+            tableKey: '',
+            exportDialog: false
         }
     },
 
@@ -520,6 +529,8 @@ export default {
         <Dialog :header="'Edit ' + editCell?.data?.field" v-model:visible="editCell.active" class="add-row-dialog" :modal="true">
             <CellDialog :finish="UpdateCell" :tableKey="tableKey" :data="editCell.data" :error="editCell.error" :tableStructure="tableStructure" />
         </Dialog>
+        
+        <ExportDialog :title="$t('export.export_table')" :database="$route.params.database" :table="table" :visible="exportDialog" @visibilityChange="val => exportDialog = val" />
     </div>
 </template>
 

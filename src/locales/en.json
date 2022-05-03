@@ -63,8 +63,11 @@
     
     "export": {
         "export_database": "Export Database",
+        "export_table": "Export Table",
         "export": "Export",
         "select_file": "Select the save file",
-        "selected_file": "Selected file"
+        "selected_file": "Selected file",
+        "success": "Table Exported",
+        "success_message": "The table has been exported successfully"
     }
 }

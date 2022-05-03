@@ -42,13 +42,11 @@ export default {
                         },
                         {
                             label: 'Import',
-                            icon: 'pi pi-upload',
-                            command: () => this.importDialog = true
+                            icon: 'pi pi-upload'
                         },
                         {
                             label: 'Export',
-                            icon: 'pi pi-download',
-                            command: () => this.exportDialog = true
+                            icon: 'pi pi-download'
                         },
                         {
                             label: 'Drop Database',
@@ -61,7 +59,7 @@ export default {
 
             createTableDialog: false,
             importDialog: false,
-            exportDialog: true,
+            exportDialog: false,
 
 
             deleteDatabaseDialog: false
@@ -181,7 +179,6 @@ export default {
         <ImportDialog :visible="importDialog" @visibilityChange="val => importDialog = val" />
 
         <ExportDialog :database="database" :visible="exportDialog" @visibilityChange="val => exportDialog = val" />
-
 
         <Dialog :draggable="false" :modal="true" :header="$t('home.drop_database_confirm')" class="db-dialog" v-model:visible="deleteDatabaseDialog" >
             <InlineMessage severity="error" class="mb-3 w-full">

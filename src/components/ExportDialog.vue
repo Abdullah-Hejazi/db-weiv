@@ -2,20 +2,22 @@
 
 const { ipcRenderer } = require('electron')
 
-import DatabaseService from '@/services/databaseservice'
+import DatabaseManager from '@/services/databasemanager'
 
 export default {
     name: 'ExportDialog',
 
     props: [
         'visible',
-        'database'
+        'database',
+        'table',
+        'title'
     ],
 
     data () {
         return {
             active: false,
-            sqlFile: 'C:/Users/amahe/Desktop/test.sql'
+            sqlFile: ''
         }
     },
 
@@ -34,13 +36,32 @@ export default {
             }
         },
 
-        ExportFile () {
-            let databaseService = new DatabaseService(this.database)
-            databaseService.exportTable({
-                file: this.sqlFile,
-                table: 'users',
-                clear: true
-            })
+        async ExportFile () {
+            this.$loading.show()
+
+            if (this.table) {
+                await DatabaseManager.exportTable({
+                    database: this.database,
+                    file: this.sqlFile,
+                    table: this.table,
+                    clear: true
+                })
+            } else {
+                // export database, not implemented yet
+            }
+            
+
+            this.active = false
+
+            this.$loading.hide()
+
+            this.$toast.add({
+                severity:'success',
+                summary: this.$t('export.success'),
+                detail: this.$t('export.success_message'),
+                life: 3000
+            });
+
         }
     },
 
@@ -57,8 +78,8 @@ export default {
 </script>
 
 <template>
-    <Dialog class="dialog-width" v-model:visible="active" :header="$t('export.export_database')" :modal="true">
-        <div class="border-dashed border-gray-600 text-center" @click="ExportFile">
+    <Dialog class="dialog-width" v-model:visible="active" :header="title" :modal="true">
+        <div class="border-dashed border-gray-600 text-center" @click="SelectFile">
             <div class="text-3xl text-gray-600 p-5" v-if="! sqlFile">
                 {{ $t('export.select_file') }}
                 <i class="pi pi-download text-3xl"></i>

@@ -44,12 +44,10 @@ export default {
             queries.data.unshift('USE ' + this.$route.params.database)
 
             // this.$loading.show()
-            console.log(queries.data)
             return;
 
             DBService.bulkQuery(queries.data.join(';')).finally(() => {
                 this.$loading.hide()
-                console.log('finished')
                 this.$emit('visibilityChange', false)
             })
 
