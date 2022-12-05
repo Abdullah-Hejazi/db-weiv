@@ -23,7 +23,7 @@ function createWindow() {
         minWidth: 800,
         minHeight: 600,
         frame: process.env.WEBPACK_DEV_SERVER_URL,
-        icon: __dirname + '/favicon.ico',
+        icon: __dirname + '/favicon.png',
         title: 'DB Weiv - Database Viewer',
         webPreferences: {
 
@@ -84,7 +84,7 @@ app.on('ready', async () => {
 
 let appIcon = null
 app.whenReady().then(() => {
-    appIcon = new Tray(__dirname + '/favicon.ico')
+    appIcon = new Tray(__dirname + '/favicon.png')
 
     const contextMenu = Menu.buildFromTemplate([
         {

@@ -6,7 +6,17 @@ module.exports = {
                 win: {
                     target: 'portable',
                     asar: true,
-                    icon: 'build/icon.ico'
+                    icon: 'build/icon.png'
+                },
+                linux:{
+                    target:[
+                        "deb",
+                    ],
+                    category: "Development",
+                    icon: 'build/icon.png'
+                },
+                directories:{
+                    buildResources: "build"
                 }
               }
         }
