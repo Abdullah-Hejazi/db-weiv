@@ -1,6 +1,8 @@
 <script>
 import AccountItem from '@/components/AccountItem'
 
+const settings = require('electron-settings')
+
 export default {
     name: 'LoginView',
 
@@ -33,7 +35,11 @@ export default {
     },
 
     mounted () {
-        this.savedAccounts = localStorage.getItem('savedAccounts') ? JSON.parse(localStorage.getItem('savedAccounts')) : []
+        settings.get('savedAccounts').then(value => {
+            if (value?.data) {
+                this.savedAccounts = JSON.parse(value.data)
+            }
+        })
     },
 
     methods: {
@@ -90,14 +96,20 @@ export default {
             }
 
             this.savedAccounts.push(data)
-            localStorage.setItem('savedAccounts', JSON.stringify(this.savedAccounts))
+
+            settings.set('savedAccounts', {
+                data: JSON.stringify(this.savedAccounts)
+            })
 
             this.displayNameDialog = false
         },
 
         RemoveAccount(index) {
             this.savedAccounts.splice(index, 1);
-            localStorage.setItem('savedAccounts', JSON.stringify(this.savedAccounts))
+
+            settings.set('savedAccounts', {
+                data: JSON.stringify(this.savedAccounts)
+            })
         },
 
         async LoadAccount() {

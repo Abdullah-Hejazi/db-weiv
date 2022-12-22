@@ -2,6 +2,8 @@
 
 import TitleBar from '@/components/TitleBar'
 
+const settings = require('electron-settings')
+
 export default {
     name: 'DB Weiv - Database Viewer',
 
@@ -73,13 +75,18 @@ export default {
 
             document.getElementById(this.theme).rel = 'stylesheet';
 
-            localStorage.setItem('theme', this.theme);
+            settings.set('theme', {
+                data: this.theme
+            })
         },
 
         SelectLanguage() {
             if (this.language) {
                 this.$i18n.locale = this.language;
-                localStorage.setItem('language', this.language);
+
+                settings.set('language', {
+                    data: this.language
+                })
             }
         },
 
@@ -89,13 +96,12 @@ export default {
     },
 
     created() {
-        // load language
-        let language = localStorage.getItem('language')
-
-        if (language) {
-            this.language = localStorage.getItem('language');
-            this.SelectLanguage()
-        }
+        settings.get('language').then(value => {
+            if (value?.data) {
+                this.language = value.data
+                this.SelectLanguage()
+            }
+        })
 
         this.themes.forEach(theme => {
             let link = document.createElement('link');
@@ -110,8 +116,15 @@ export default {
         link.href = 'primeicons.css';
         document.head.appendChild(link);
 
-        this.theme = localStorage.getItem('theme') ?? 'arya-blue';
-        this.SelectTheme()
+        settings.get('theme').then(value => {
+            if (value?.data) {
+                this.theme = value.data
+            } else {
+                this.theme = 'arya-blue'
+            }
+
+            this.SelectTheme()
+        })
     }
 }
 

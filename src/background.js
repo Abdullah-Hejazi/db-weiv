@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, Menu, Tray, dialog } from 'electron'
+import { app, protocol, BrowserWindow, dialog } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
 const ipcMain = require('electron').ipcMain;
@@ -26,6 +26,7 @@ function createWindow() {
         icon: __dirname + '/favicon.png',
         title: 'DB Weiv - Database Viewer',
         webPreferences: {
+            enableRemoteModule: true,
 
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -45,15 +46,6 @@ function createWindow() {
         // Load the index.html when not in development
         win.loadURL('app://./index.html')
     }
-
-    win.on('close', function (event) {
-        if(! app.isQuiting){
-            event.preventDefault();
-            win.hide();
-        }
-    
-        return false;
-    });
 
     win.webContents.setWindowOpenHandler(function(e) {
         require('electron').shell.openExternal(e.url);
@@ -132,7 +124,7 @@ ipcMain.on('maximize-app', function (event, path) {
 
 ipcMain.on('close-app', function (event, path) {
     app.quit()
-});
+})
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
