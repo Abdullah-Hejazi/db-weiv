@@ -82,32 +82,7 @@ app.on('ready', async () => {
     createWindow()
 })
 
-let appIcon = null
 app.whenReady().then(() => {
-    appIcon = new Tray(__dirname + '/favicon.png')
-
-    const contextMenu = Menu.buildFromTemplate([
-        {
-            label: 'Open',
-            click: function () {
-                win.show()
-            }
-        },
-        {
-            label: 'Exit',
-            click: function () {
-                app.exit();
-            }
-        }
-    ])
-
-    appIcon.setToolTip('DB Weiv - Database Viewer')
-
-    appIcon.on('double-click', function () {
-        win.show()
-    })
-
-    appIcon.setContextMenu(contextMenu)
 })
 
 // open dialog
@@ -156,7 +131,7 @@ ipcMain.on('maximize-app', function (event, path) {
 });
 
 ipcMain.on('close-app', function (event, path) {
-    win.close();
+    app.quit()
 });
 
 // Exit cleanly on request from parent process in development mode.
