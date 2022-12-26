@@ -23,7 +23,7 @@ function createWindow() {
         minWidth: 800,
         minHeight: 600,
         frame: process.env.WEBPACK_DEV_SERVER_URL,
-        icon: __dirname + '/favicon.png',
+        icon: __dirname + '/icon.png',
         title: 'DB Weiv - Database Viewer',
         webPreferences: {
             enableRemoteModule: true,

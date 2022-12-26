@@ -6,17 +6,18 @@ module.exports = {
                 win: {
                     target: 'portable',
                     asar: true,
-                    icon: 'build/icon.png'
+                    icon: 'icon.ico'
                 },
                 linux:{
                     target:[
                         "deb",
                     ],
                     category: "Development",
-                    icon: 'build/icon.png'
-                },
-                directories:{
-                    buildResources: "build"
+
+                    vendor: 'Abdullah Hejazi',
+                    maintainer: 'Abdullah Hejazi',
+                    synopsis: 'A database viewer for mysql',
+                    description: 'A Database viewer for mysql that allows you to easily view, edit, and delete data from your database',
                 }
               }
         }
